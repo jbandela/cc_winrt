@@ -25,6 +25,8 @@ namespace cc_winrt{
     using cross_compiler_interface::use_unknown;
     using cross_compiler_interface::use_interface;
     using cross_compiler_interface::implement_interface;
+    using cross_compiler_interface::uuid;
+    using cross_compiler_interface::uuid_base;
 
     // Preserves HSTRING
     inline std::wstring WStringFromHSTRING(HSTRING h){
@@ -62,7 +64,7 @@ namespace cc_winrt{
     namespace detail{
         template<class Iface,int Id>
         struct get_iids_cross_function
-            :public cross_compiler_interface::custom_cross_function<Iface,Id,std::vector<cross_compiler_interface::uuid_base*>(),std::error_code(cross_compiler_interface::portable_base*,ULONG*,cross_compiler_interface::uuid_base**),
+            :public cross_compiler_interface::custom_cross_function<Iface,Id,std::vector<cross_compiler_interface::uuid_base>(),cross_compiler_interface::error_code(cross_compiler_interface::portable_base*,ULONG*,cross_compiler_interface::uuid_base**),
            get_iids_cross_function<Iface,Id> >
         {
                 std::vector<cross_compiler_interface::uuid_base*> call_vtable_function()const{
@@ -83,13 +85,17 @@ namespace cc_winrt{
 				static cross_compiler_interface::error_code vtable_function(F f,cross_compiler_interface::portable_base* p,ULONG* pcount,cross_compiler_interface::uuid_base** iids){
                     try{
                         if(!iids || *pcount){
-                            return cross_compiler_interface::error_pointer::get_error_code();
+                            return cross_compiler_interface::error_pointer::ec;
                         }
-                        std::vector<cross_compiler_interface::uuid_base*> v = f();
-                        auto piids = static_cast<cross_compiler_interface::uuid_base*>(::CoTaskMemAlloc(v.size()*sizeof(cross_compiler_interface::uuid_base*)));
+                        std::vector<cross_compiler_interface::uuid_base> v = f();
+                        if(v.empty()){
+                            *pcount = 0;
+                            *iids = nullptr;
+                        }
+                        auto piids = static_cast<cross_compiler_interface::uuid_base*>(::CoTaskMemAlloc(v.size()*sizeof(v[0])));
                         if(!piids){
                             *pcount = 0;
-                            return cross_compiler_interface::error_out_of_memory::get_error_code();
+                            return cross_compiler_interface::error_out_of_memory::ec;
                         }
                         std::copy(v.begin(),v.end(),piids);
                         *iids = piids;
@@ -161,9 +167,9 @@ namespace cc_winrt{
 				helper<Rest...>::set_mem_functions(t);
 			}
 
-            static void add_iids(std::vector<cross_compiler_interface::uuid_base*>& v){
+            static void add_iids(std::vector<cross_compiler_interface::uuid_base>& v){
                 auto& u = typename cross_compiler_interface::implement_interface<First>::uuid::get();
-                v.push_back(&u);
+                v.push_back(u);
 
 				helper<Rest...>::add_iids(v);
             }
@@ -184,9 +190,9 @@ namespace cc_winrt{
 
 			}
 
-            static void add_iids(std::vector<cross_compiler_interface::uuid_base*>& v){
+            static void add_iids(std::vector<cross_compiler_interface::uuid_base>& v){
                 auto& u = typename cross_compiler_interface::implement_interface<First>::uuid::get();
-                v.push_back(&u);
+                v.push_back(u);
             }
 
 		};
@@ -194,17 +200,17 @@ namespace cc_winrt{
 
 
 	public:
-		std::vector<cross_compiler_interface::uuid_base*> GetIids(){
-            std::vector<cross_compiler_interface::uuid_base*> v;
+		std::vector<cross_compiler_interface::uuid_base> GetIids(){
+            std::vector<cross_compiler_interface::uuid_base> v;
             helper<Interfaces...>::add_iids(v);
             return v;
 		}
 
-        static HSTRING GetRuntimeClassName(){
+        HSTRING GetRuntimeClassName(){
             return HSTRINGFromWString(Derived::GetRuntimeClass());
         }
 
-        static TrustLevel GetTrustLevel(){
+        TrustLevel GetTrustLevel(){
             return Derived::GetTrustLevel();
         }
 
@@ -257,10 +263,14 @@ namespace cc_winrt{
 
         static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
 
+        static         HSTRING GetRuntimeClassName(){
+            return HSTRINGFromWString(Derived::GetRuntimeClass());
+        }
+
 
 
         struct implement_factory_static_interfaces
-            :public detail::implement_factory_static_helper<Derived,FactoryInterface,StaticInterface>{
+            :public detail::implement_factory_static_helper<typename Derived::ImplementFactoryStaticInterfaces,FactoryInterface,StaticInterface>{
             cross_compiler_interface::implement_interface<FactoryInterface>* factory_interface(){
                 return this->get_implementation<FactoryInterface>();
             }
@@ -273,6 +283,14 @@ namespace cc_winrt{
                 return this->get_implementation<StaticInterface>();
             }
 
+            static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
+
+            static HSTRING GetRuntimeClassName(){
+                return HSTRINGFromWString(Derived::GetRuntimeClass());
+            }
+            static std::wstring GetRuntimeClass(){
+                return Derived::GetRuntimeClass();
+            }
         };
         static use_unknown<InterfaceActivationFactory> GetActivationFactory(HSTRING hs){
             auto w = WStringFromHSTRING(hs);
