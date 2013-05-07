@@ -133,8 +133,20 @@ namespace cc_winrt{
         InterfaceInspectable():GetIids(this),GetRuntimeClassName(this),GetTrustLevel(this){}
 
     };    
+    // This interface is for use with define_inspectable_interface
+    // The reason we have this is so in the derived interfaces, use of InterfaceInspectable with yield a template and not a class
+        template<class T>
+    struct InterfaceInspectable_:public cross_compiler_interface::define_unknown_interface<T,cross_compiler_interface::uuid<0xAF86E2E0,0xB12D,0x4c6a,0x9C,0x5A,0xD7,0xAA,0x65,0x10,0x1E,0x90>>{
 
-    template<class T,class uuid_type, template<class> class Base = InterfaceInspectable >
+        detail::get_iids_cross_function<InterfaceInspectable_,0> GetIids;
+        cross_function<InterfaceInspectable_,1,HSTRING()> GetRuntimeClassName;
+        cross_function<InterfaceInspectable_,2,TrustLevel()> GetTrustLevel;
+
+        InterfaceInspectable_():GetIids(this),GetRuntimeClassName(this),GetTrustLevel(this){}
+
+    };    
+
+    template<class T,class uuid_type, template<class> class Base = InterfaceInspectable_ >
     struct define_inspectable_interface
         :public cross_compiler_interface::define_unknown_interface<T,uuid_type,Base>
     {
@@ -218,14 +230,13 @@ namespace cc_winrt{
 			helper<Interfaces...>::set_mem_functions(this);
 		}
 	};
-
-    typedef cross_compiler_interface::use_unknown<InterfaceInspectable> UseInterfaceInspectable;
+    
 
     template<class T>
-    struct InterfaceActivationFactory
-        :public define_inspectable_interface<T,cross_compiler_interface::uuid<0xAF86E2E0,0xB12D,0x4c6a,0x9C,0x5A,0xD7,0xAA,0x65,0x10,0x1E,0x90>>
+    struct InterfaceActivationFactory                     
+        :public define_inspectable_interface<T,cross_compiler_interface::uuid<0x00000035,0x0000,0x0000,0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46>>
     {
-        cross_function<InterfaceActivationFactory,0,UseInterfaceInspectable()> ActivateInstance;
+        cross_function<InterfaceActivationFactory,0,cross_compiler_interface::use_unknown<InterfaceInspectable>()> ActivateInstance;
 
 
         InterfaceActivationFactory():ActivateInstance(this){}
@@ -292,10 +303,13 @@ namespace cc_winrt{
                 return Derived::GetRuntimeClass();
             }
         };
-        static use_unknown<InterfaceActivationFactory> GetActivationFactory(HSTRING hs){
+        static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
             auto w = WStringFromHSTRING(hs);
             if(w==Derived::GetRuntimeClass()){
-                return implement_factory_static_interfaces::create.QueryInterface<InterfaceActivationFactory>();
+                return implement_factory_static_interfaces::create().QueryInterface<InterfaceActivationFactory>();
+            }
+            else{
+                return nullptr;
             }
         }
         implement_winrt_runtime_class(){
@@ -305,7 +319,61 @@ namespace cc_winrt{
     };
 
 
+    template<class... Imps>
+    struct get_activation_factory_helper{
+        template<class... I>
+        struct helper{};
 
+        template<class First, class... Rest>
+        struct helper<First,Rest...>{
+            static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
+                auto r = First::get_activation_factory(hs);
+                if(r){
+                    return r;
+                }
+                else{
+                    helper<Rest...>::get_activation_factory(hs);
+
+                }
+            }
+
+        };
+
+        template<class First>
+        struct helper<First>{
+            static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
+                auto r = First::get_activation_factory(hs);
+                if(r){
+                    return r;
+                }
+                else{
+                    return nullptr;
+                }
+            }
+
+        };
+        static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
+            return helper<Imps...>::get_activation_factory(hs);
+        }
+
+    };
+
+    template<class...Imps>
+    HRESULT get_activation_factory( HSTRING activatibleClassId, IActivationFactory** factory){
+        try{
+        auto r = get_activation_factory_helper<Imps...>::get_activation_factory(activatibleClassId);
+        if(r){
+            *factory = reinterpret_cast<IActivationFactory*>(r.get_portable_base_addref());
+            return S_OK;
+        }
+        else{
+            return cross_compiler_interface::error_no_interface::ec;
+        }
+        }
+        catch(std::exception& e){
+            return cross_compiler_interface::general_error_mapper::error_code_from_exception(e);
+        }
+    }
 
 
 }
