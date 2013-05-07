@@ -302,6 +302,15 @@ namespace cc_winrt{
             static std::wstring GetRuntimeClass(){
                 return Derived::GetRuntimeClass();
             }
+
+            auto activate_instance()->cc_winrt::use_unknown<cc_winrt::InterfaceInspectable>{
+                return Derived::create().QueryInterface<cc_winrt::InterfaceInspectable>();
+            }
+            implement_factory_static_interfaces(){
+
+                activation_factory_interface()->ActivateInstance.template set_mem_fn<
+                    implement_factory_static_interfaces,&implement_factory_static_interfaces::activate_instance>(this);
+            }
         };
         static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
             auto w = WStringFromHSTRING(hs);
@@ -374,6 +383,80 @@ namespace cc_winrt{
             return cross_compiler_interface::general_error_mapper::error_code_from_exception(e);
         }
     }
+
+
+    //// Usage
+    //    template<class Derived, class WRC>
+    //struct use_winrt_runtime_class{};
+
+    //namespace detail{
+    //    // All Factories must support IActivationFactory as baseline, plus may support more in addition to
+    //    template<class Derived, template<class>class FactoryInterface,template<class> class StaticInterface>
+    //    struct use_factory_static_helper
+    //        :public use_unknown<InterfaceActivationFactory>,use_unknown<FactoryInterface>,use_unknown<StaticInterface>{
+
+    //    };
+    //    template<class Derived, template<class> class StaticInterface>
+    //    struct use_factory_static_helper<Derived,InterfaceActivationFactory,StaticInterface>
+    //        :public implement_inspectable_interfaces<Derived,InterfaceActivationFactory,StaticInterface>{
+
+    //    };
+    //}
+
+    //template<class Derived, template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
+    //struct implement_winrt_runtime_class<Derived,winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
+    //    :public implement_inspectable_interfaces<Derived,DefaultInterface,Others...>
+    //{
+    //    cross_compiler_interface::implement_interface<DefaultInterface>* default_interface(){
+    //        return this->get_implementation<DefaultInterface>();
+
+    //    }
+
+    //    static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
+
+    //    static         HSTRING GetRuntimeClassName(){
+    //        return HSTRINGFromWString(Derived::GetRuntimeClass());
+    //    }
+
+
+
+    //    struct implement_factory_static_interfaces
+    //        :public detail::implement_factory_static_helper<typename Derived::ImplementFactoryStaticInterfaces,FactoryInterface,StaticInterface>{
+    //        cross_compiler_interface::implement_interface<FactoryInterface>* factory_interface(){
+    //            return this->get_implementation<FactoryInterface>();
+    //        }
+
+    //        cross_compiler_interface::implement_interface<InterfaceActivationFactory>* activation_factory_interface(){
+    //            return this->get_implementation<InterfaceActivationFactory>();
+    //        }
+
+    //        cross_compiler_interface::implement_interface<StaticInterface> static_interface(){
+    //            return this->get_implementation<StaticInterface>();
+    //        }
+
+    //        static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
+
+    //        static HSTRING GetRuntimeClassName(){
+    //            return HSTRINGFromWString(Derived::GetRuntimeClass());
+    //        }
+    //        static std::wstring GetRuntimeClass(){
+    //            return Derived::GetRuntimeClass();
+    //        }
+    //    };
+    //    static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
+    //        auto w = WStringFromHSTRING(hs);
+    //        if(w==Derived::GetRuntimeClass()){
+    //            return implement_factory_static_interfaces::create().QueryInterface<InterfaceActivationFactory>();
+    //        }
+    //        else{
+    //            return nullptr;
+    //        }
+    //    }
+    //    implement_winrt_runtime_class(){
+
+    //    }
+
+    //};
 
 
 }
