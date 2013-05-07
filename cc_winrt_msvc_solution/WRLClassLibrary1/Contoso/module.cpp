@@ -10,11 +10,11 @@ extern "C" HRESULT WINAPI DllCanUnloadNow();
 #if !defined(__WRL_CLASSIC_COM__)
 extern "C" HRESULT WINAPI DllGetActivationFactory(_In_ HSTRING, _Deref_out_ IActivationFactory**);
 
-extern "C" HRESULT WINAPI DllGetActivationFactory(_In_ HSTRING activatibleClassId, _Deref_out_ IActivationFactory** factory)
-{
-    auto &module = Microsoft::WRL::Module<Microsoft::WRL::InProc>::GetModule();
-    return module.GetActivationFactory(activatibleClassId, factory);
-}
+//extern "C" HRESULT WINAPI DllGetActivationFactory(_In_ HSTRING activatibleClassId, _Deref_out_ IActivationFactory** factory)
+//{
+//    auto &module = Microsoft::WRL::Module<Microsoft::WRL::InProc>::GetModule();
+//    return module.GetActivationFactory(activatibleClassId, factory);
+//}
 #endif
 
 #if !defined(__WRL_WINRT_STRICT__)
@@ -32,11 +32,11 @@ extern "C" BOOL WINAPI DllMain(_In_opt_ HINSTANCE, DWORD, _In_opt_ LPVOID)
     return TRUE;
 }
 
-extern "C" HRESULT WINAPI DllCanUnloadNow()
-{
-    const auto &module = Microsoft::WRL::Module<Microsoft::WRL::InProc>::GetModule();    
-    return module.GetObjectCount() == 0 ? S_OK : S_FALSE;
-}
+//extern "C" HRESULT WINAPI DllCanUnloadNow()
+//{
+//    const auto &module = Microsoft::WRL::Module<Microsoft::WRL::InProc>::GetModule();    
+//    return module.GetObjectCount() == 0 ? S_OK : S_FALSE;
+//}
 
 #if defined(_M_IX86)
 #if !defined(__WRL_CLASSIC_COM__)

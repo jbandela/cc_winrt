@@ -78,7 +78,15 @@ namespace cc_winrt{
                         *pcount = 0;
                         return cross_compiler_interface::error_out_of_memory::ec;
                     }
+#ifdef _MSC_VER
+                    std::copy(v.begin(),v.end(),stdext::checked_array_iterator<decltype(piids)>(piids,v.size()));
+#else
                     std::copy(v.begin(),v.end(),piids);
+#endif
+                    auto p = piids;
+                    for(const auto& i:v){
+                        *p++ = i;
+                    }
                     *iids = piids;
                     *pcount = v.size();
 

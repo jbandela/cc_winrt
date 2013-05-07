@@ -4,9 +4,9 @@
 
 
  /* File created by MIDL compiler version 8.00.0595 */
-/* at Tue May 07 18:10:21 2013
+/* at Tue May 07 18:27:04 2013
  */
-/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\Contoso.idl-95e5f3a4:
+/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\Contoso.idl-98f46cc3:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0595 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
