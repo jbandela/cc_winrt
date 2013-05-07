@@ -464,6 +464,7 @@ namespace cc_winrt{
 
         };
 
+
     }
 
     inline use_unknown<InterfaceActivationFactory> get_activation_factory(const std::wstring id){
@@ -500,6 +501,52 @@ namespace cc_winrt{
             }
         };
 
+        template<class CF, class F>
+        struct interface_overload_function_helper{
+
+
+        };
+        template<class CF, class R, class... Parms>
+        struct interface_overload_function_helper<CF,R(Parms...)>{
+
+             R overloaded_call(cross_compiler_interface::portable_base* p, Parms... parms){
+                CF cf(p);
+                return cf(parms...);
+            }
+
+        };
+                template<class CF>
+        struct interface_overload_function:public interface_overload_function_helper<CF,typename CF::function_signature>{
+            using interface_overload_function_helper::overloaded_call;
+        };
+
+
+
+        template<class... CF>
+        struct inheritance_overload_helper{};
+        template<class First,class... CF>
+        struct inheritance_overload_helper<First,CF...>:public interface_overload_function<First>,inheritance_overload_helper<CF...>{
+            using interface_overload_function_helper::overloaded_call;
+        };
+        template<>
+        struct inheritance_overload_helper<>{};
+
+        template<class TypeList>
+        struct forward_to_inheritance_overload_helper{};
+
+        template<class... T>
+        struct forward_to_inheritance_overload_helper<cross_compiler_interface::type_list<T...>>{
+            typedef inheritance_overload_helper<T...> type;
+        };
+
+        template<class Interface,class... Parms>
+        static use_unknown<InterfaceInspectable> overloaded_creator(Interface i,Parms... p){
+            typedef typename cross_compiler_interface::type_information<Interface>::functions functions;
+            typedef typename forward_to_inheritance_overload_helper<functions>::type helper;
+            cross_compiler_interface::portable_base* pb = i.get_portable_base();
+            helper h;
+            return h.overloaded_call(pb,p...).QueryInterface<InterfaceInspectable>();
+        }
     }
 
     template<template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
@@ -538,8 +585,16 @@ namespace cc_winrt{
             h_t::set_use_unknown(this);
         }
 
+        template<class P,class... Parms>
+        use_winrt_runtime_class(P p0,Parms... p)
+            :detail::inspectable_holder(detail::overloaded_creator(factory_interface(),p0,p...))
+        {
+            typedef detail::use_runtime_class_helper<DefaultInterface,Others...,InterfaceInspectable> h_t;
+            h_t::set_use_unknown(this);
+        }
     private:
-  
+
+
 
     };
 
