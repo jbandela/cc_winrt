@@ -434,22 +434,14 @@ namespace cc_winrt{
 
     namespace detail{
 
+        template<template<class> class Interface, class Base>
+        struct inherit_use_interface_helper:public use_unknown<Interface>,Base{};
+
         template<template<class> class... Interfaces>
         struct inherit_use_interfaces_linearly{};
 
-        template<template<class> class First>
-        struct inherit_use_interfaces_linearly<First>:public use_unknown<First>{
-        };
-
-        // MSVC Milan has a compiler crash that we can fix
-        // by appending InterfaceInspectable_ to the list of interfaces to inherit from
-        // This specialization filters that out
-        template<>
-        struct inherit_use_interfaces_linearly<InterfaceInspectable_>{
-        };
-
         template<template<class> class First,template<class> class... Rest>
-        struct inherit_use_interfaces_linearly<First,Rest...>:public use_unknown<First>,public inherit_use_interfaces_linearly<Rest...>{;
+        struct inherit_use_interfaces_linearly<First,Rest...>:public inherit_use_interface_helper<First,inherit_use_interfaces_linearly<Rest...>> {;
 
         };
 
@@ -480,11 +472,9 @@ namespace cc_winrt{
     namespace detail{
           template<template<class> class... Interfaces>
         struct use_runtime_class_helper{};
-        // MSVC Milan has a compiler crash that we can fix
-        // by appending InterfaceInspectable to the list of interfaces to inherit from
-        // This specialization filters that out
+
         template<>
-        struct use_runtime_class_helper<InterfaceInspectable>{
+        struct use_runtime_class_helper<>{
             template<class T>
             static void set_use_unknown(T* pthis){
                 // do nothing
@@ -560,8 +550,8 @@ namespace cc_winrt{
 
     template<template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
     struct use_winrt_runtime_class<winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
-        :private detail::inspectable_holder,
-        public detail::inherit_use_interfaces_linearly<DefaultInterface,Others...,InterfaceInspectable_>
+        :private detail::inspectable_holder,//public use_unknown<DefaultInterface>, public use_unknown<Others>...
+        public detail::inherit_use_interfaces_linearly<DefaultInterface,Others...>
     {
         typedef winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
         cross_compiler_interface::use_unknown<DefaultInterface> default_interface(){
@@ -590,7 +580,7 @@ namespace cc_winrt{
         use_winrt_runtime_class()
             :detail::inspectable_holder(activation_factory_interface().ActivateInstance())
         {
-            typedef detail::use_runtime_class_helper<DefaultInterface,Others...,InterfaceInspectable> h_t;
+            typedef detail::use_runtime_class_helper<DefaultInterface,Others...> h_t;
             h_t::set_use_unknown(this);
         }
 
@@ -598,7 +588,7 @@ namespace cc_winrt{
         use_winrt_runtime_class(P p0,Parms... p)
             :detail::inspectable_holder(detail::overloaded_creator(factory_interface(),p0,p...))
         {
-            typedef detail::use_runtime_class_helper<DefaultInterface,Others...,InterfaceInspectable> h_t;
+            typedef detail::use_runtime_class_helper<DefaultInterface,Others...> h_t;
             h_t::set_use_unknown(this);
         }
     private:
