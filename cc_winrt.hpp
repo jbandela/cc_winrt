@@ -1,17 +1,13 @@
-#include "../cross_compiler_call/cross_compiler_interface/cross_compiler_introspection.hpp"
-
-#include <Hstring.h>
-#include <string>
 
 #include <Inspectable.h>
 #include <Objbase.h>
-#include <algorithm>
-#include <Hstring.h>
-#include <Winstring.h>
-#include <wrl.h>
+#include <Roapi.h> 
+
+#include "hstring_utilities.hpp"
+#include "../cross_compiler_call/cross_compiler_interface/cross_compiler_introspection.hpp"
 
 
-
+// Allow HSTRING and TrustLevel to be used in cross_function signatures
 namespace cross_compiler_interface{
 
     template<>
@@ -21,82 +17,32 @@ namespace cross_compiler_interface{
     struct cross_conversion<TrustLevel>:public trivial_conversion<TrustLevel>{};
 }
 
+
+// Allow introspection on those types
 CROSS_COMPILER_INTERFACE_DEFINE_TYPE_INFORMATION(HSTRING);
 CROSS_COMPILER_INTERFACE_DEFINE_TYPE_INFORMATION(TrustLevel);
 
 namespace cc_winrt{
+
+    // Use the following templates from cross_compiler_interface
     using cross_compiler_interface::cross_function;
     using cross_compiler_interface::use_unknown;
     using cross_compiler_interface::use_interface;
     using cross_compiler_interface::implement_interface;
     using cross_compiler_interface::uuid;
-    using cross_compiler_interface::uuid_base;
-    using cross_compiler_interface::type_to_type;
 
-    // Preserves HSTRING
-    inline std::wstring WStringFromHSTRING(HSTRING h){
-        if( ::WindowsIsStringEmpty(h)){
-            return std::wstring();
-        }
-        UINT32 sz = 0;
-        auto p = ::WindowsGetStringRawBuffer(h,&sz);
-        std::wstring r(p,p+sz);
-
-        return r;
-    }  
-    // Destructive to HSTRING
-    inline std::wstring WStringFromHSTRING(HSTRING&& h){
-        if( ::WindowsIsStringEmpty(h)){
-            return std::wstring();
-        }
-        UINT32 sz = 0;
-        auto p = ::WindowsGetStringRawBuffer(h,&sz);
-        std::wstring r(p,p+sz);
-        ::WindowsDeleteString(h);
-        h = nullptr;
-        return r;
-    }
-
-    inline HSTRING HSTRINGFromWString(const std::wstring& w){
-        HSTRING r = nullptr;
-        auto e = ::WindowsCreateString(w.c_str(),w.size(),&r);
-        if(e < 0){
-            cross_compiler_interface::general_error_mapper::exception_from_error_code(e);
-        }
-        return r;
-    }
-
-    struct unique_hstring{
-        HSTRING hs_;
-        unique_hstring(HSTRING h):hs_(h){}
-
-        static HSTRING empty_string(){
-            HSTRING hs;
-            ::WindowsCreateString(nullptr,0,&hs);
-            return hs;
-        }
-
-        HSTRING get(){return hs_;}
-        HSTRING release(){
-            HSTRING hs = hs_;
-            hs_ = empty_string();
-            return hs;
-        }
-
-        ~unique_hstring(){
-            ::WindowsDeleteString(hs_);
-            hs_ = empty_string();
-        }
-    };
+  
 
 
     template<class WRC>
     struct RuntimeClassName{
-
-        // std::wstring GetRuntimeClass(){return L"";}
+        // Specialize for each winrt_runtime_class
+        // std::wstring Get(){return L"Example.ClassName";}
     };
 
     namespace detail{
+
+        // A custom_cross_function for GetIids. 
         template<class Iface,int Id>
         struct get_iids_cross_function
             :public cross_compiler_interface::custom_cross_function<Iface,Id,std::vector<cross_compiler_interface::uuid_base>(),cross_compiler_interface::error_code(cross_compiler_interface::portable_base*,ULONG*,cross_compiler_interface::uuid_base**),
@@ -158,6 +104,7 @@ namespace cc_winrt{
         };
     }
 
+    // IInspectable
     template<class T>
     struct InterfaceInspectable:public cross_compiler_interface::define_unknown_interface<T,cross_compiler_interface::uuid<0xAF86E2E0,0xB12D,0x4c6a,0x9C,0x5A,0xD7,0xAA,0x65,0x10,0x1E,0x90>>{
 
@@ -181,6 +128,7 @@ namespace cc_winrt{
 
     };    
 
+    // Define an interface derived from IInspectable
     template<class T,class uuid_type, template<class> class Base = InterfaceInspectable_ >
     struct define_inspectable_interface
         :public cross_compiler_interface::define_unknown_interface<T,uuid_type,Base>
@@ -189,6 +137,7 @@ namespace cc_winrt{
 
     };
 
+    // Implement interfaces derived from IInspectable and provide implementations of IUknown and IInspectable Methods
     template<class Derived, template<class> class... Interfaces>
     struct implement_inspectable_interfaces:public cross_compiler_interface::implement_unknown_interfaces<Derived,Interfaces...>{
 
@@ -266,7 +215,7 @@ namespace cc_winrt{
         }
     };
 
-
+    // IActivationFactory
     template<class T>
     struct InterfaceActivationFactory                     
         :public define_inspectable_interface<T,cross_compiler_interface::uuid<0x00000035,0x0000,0x0000,0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46>>
@@ -277,15 +226,19 @@ namespace cc_winrt{
         InterfaceActivationFactory():ActivateInstance(this){}
     };
 
+    // Defines a winrt_runtime class
     template<template<class> class DefaultInterface,template <class> class FactoryInterface,template<class> class StaticInterface, template<class> class... OtherInterfaces>
     struct winrt_runtime_class{};
 
 
+
+    // Enables implementing runtime class
     template<class Derived, class WRC>
     struct implement_winrt_runtime_class{};
 
     namespace detail{
-        // All Factories must support IActivationFactory as baseline, plus may support more in addition to
+        // All Factories must support IActivationFactory as baseline, plus may support more in addition to IActivationFactory
+        
         template<class Derived, template<class>class FactoryInterface,template<class> class StaticInterface>
         struct implement_factory_static_helper
             :public implement_inspectable_interfaces<Derived,InterfaceActivationFactory,FactoryInterface,StaticInterface>{
@@ -297,11 +250,14 @@ namespace cc_winrt{
 
         };
     }
-
+    // Template to help implement a winrt runtime class
+    // You inherit from this class, providing the name of your class in derived
     template<class Derived, template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
     struct implement_winrt_runtime_class<Derived,winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
         :public implement_inspectable_interfaces<Derived,DefaultInterface,Others...>
     {
+
+        // The runtime class default interface
         typedef winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
         cross_compiler_interface::implement_interface<DefaultInterface>* default_interface(){
             return this->get_implementation<DefaultInterface>();
@@ -550,7 +506,7 @@ namespace cc_winrt{
 
     template<template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
     struct use_winrt_runtime_class<winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
-        :private detail::inspectable_holder,//public use_unknown<DefaultInterface>, public use_unknown<Others>...
+        :private detail::inspectable_holder,
         public detail::inherit_use_interfaces_linearly<DefaultInterface,Others...>
     {
         typedef winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
@@ -597,75 +553,7 @@ namespace cc_winrt{
 
     };
 
-    //namespace detail{
-    //    // All Factories must support IActivationFactory as baseline, plus may support more in addition to
-    //    template<class Derived, template<class>class FactoryInterface,template<class> class StaticInterface>
-    //    struct use_factory_static_helper
-    //        :public use_unknown<InterfaceActivationFactory>,use_unknown<FactoryInterface>,use_unknown<StaticInterface>{
-
-    //    };
-    //    template<class Derived, template<class> class StaticInterface>
-    //    struct use_factory_static_helper<Derived,InterfaceActivationFactory,StaticInterface>
-    //        :public implement_inspectable_interfaces<Derived,InterfaceActivationFactory,StaticInterface>{
-
-    //    };
-    //}
-
-    //template<class Derived, template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
-    //struct implement_winrt_runtime_class<Derived,winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
-    //    :public implement_inspectable_interfaces<Derived,DefaultInterface,Others...>
-    //{
-    //    cross_compiler_interface::implement_interface<DefaultInterface>* default_interface(){
-    //        return this->get_implementation<DefaultInterface>();
-
-    //    }
-
-    //    static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
-
-    //    static         HSTRING GetRuntimeClassName(){
-    //        return HSTRINGFromWString(Derived::GetRuntimeClass());
-    //    }
-
-
-
-    //    struct implement_factory_static_interfaces
-    //        :public detail::implement_factory_static_helper<typename Derived::ImplementFactoryStaticInterfaces,FactoryInterface,StaticInterface>{
-    //        cross_compiler_interface::implement_interface<FactoryInterface>* factory_interface(){
-    //            return this->get_implementation<FactoryInterface>();
-    //        }
-
-    //        cross_compiler_interface::implement_interface<InterfaceActivationFactory>* activation_factory_interface(){
-    //            return this->get_implementation<InterfaceActivationFactory>();
-    //        }
-
-    //        cross_compiler_interface::implement_interface<StaticInterface> static_interface(){
-    //            return this->get_implementation<StaticInterface>();
-    //        }
-
-    //        static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
-
-    //        static HSTRING GetRuntimeClassName(){
-    //            return HSTRINGFromWString(Derived::GetRuntimeClass());
-    //        }
-    //        static std::wstring GetRuntimeClass(){
-    //            return Derived::GetRuntimeClass();
-    //        }
-    //    };
-    //    static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
-    //        auto w = WStringFromHSTRING(hs);
-    //        if(w==Derived::GetRuntimeClass()){
-    //            return implement_factory_static_interfaces::create().QueryInterface<InterfaceActivationFactory>();
-    //        }
-    //        else{
-    //            return nullptr;
-    //        }
-    //    }
-    //    implement_winrt_runtime_class(){
-
-    //    }
-
-    //};
-
+ 
 
 }
 

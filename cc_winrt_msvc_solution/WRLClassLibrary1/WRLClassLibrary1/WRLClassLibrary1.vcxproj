@@ -232,6 +232,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\cc_winrt.hpp" />
+    <ClInclude Include="..\..\..\hstring_utilities.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
