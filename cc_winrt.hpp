@@ -501,23 +501,26 @@ namespace cc_winrt{
             }
         };
 
-        template<class CF, class F>
+        template<class Base,class CF, class F>
         struct interface_overload_function_helper{
 
 
         };
-        template<class CF, class R, class... Parms>
-        struct interface_overload_function_helper<CF,R(Parms...)>{
+        template<class Base,class CF, class R, class... Parms>
+        struct interface_overload_function_helper<Base,CF,R(Parms...)>:public Base{
 
-             R overloaded_call(cross_compiler_interface::portable_base* p, Parms... parms){
+             static R overloaded_call(cross_compiler_interface::portable_base* p, Parms... parms){
                 CF cf(p);
                 return cf(parms...);
             }
 
+
         };
-                template<class CF>
-        struct interface_overload_function:public interface_overload_function_helper<CF,typename CF::function_signature>{
+                template<class Base,class CF>
+        struct interface_overload_function:public interface_overload_function_helper<Base,CF,typename CF::function_signature>{
             using interface_overload_function_helper::overloaded_call;
+            using Base::overloaded_call;
+
         };
 
 
@@ -525,11 +528,18 @@ namespace cc_winrt{
         template<class... CF>
         struct inheritance_overload_helper{};
         template<class First,class... CF>
-        struct inheritance_overload_helper<First,CF...>:public interface_overload_function<First>,inheritance_overload_helper<CF...>{
-            using interface_overload_function_helper::overloaded_call;
+        struct inheritance_overload_helper<First,CF...>:public interface_overload_function<inheritance_overload_helper<CF...>,First>{
+            typedef First first_cf_type;
+            typedef inheritance_overload_helper<CF...> rest_cf_types;
+
         };
         template<>
-        struct inheritance_overload_helper<>{};
+        struct inheritance_overload_helper<>{
+        
+            // All calls to overloaded call have portable_base as first parameter so this will not resolve
+            void overloaded_call();
+        
+        };
 
         template<class TypeList>
         struct forward_to_inheritance_overload_helper{};
@@ -544,8 +554,7 @@ namespace cc_winrt{
             typedef typename cross_compiler_interface::type_information<Interface>::functions functions;
             typedef typename forward_to_inheritance_overload_helper<functions>::type helper;
             cross_compiler_interface::portable_base* pb = i.get_portable_base();
-            helper h;
-            return h.overloaded_call(pb,p...).QueryInterface<InterfaceInspectable>();
+            return helper::overloaded_call(pb,p...).QueryInterface<InterfaceInspectable>();
         }
     }
 
