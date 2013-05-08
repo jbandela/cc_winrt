@@ -51,15 +51,6 @@ namespace cc_winrt{
     using cross_compiler_interface::implement_interface;
     using cross_compiler_interface::uuid;
 
-  
-
-
-    //template<class WRC>
-    //struct RuntimeClassName{
-    //    // Specialize for each winrt_runtime_class
-    //    // std::wstring Get(){return L"Example.ClassName";}
-    //};
-
     namespace detail{
 
         // A custom_cross_function for GetIids. 
@@ -231,7 +222,7 @@ namespace cc_winrt{
         }
 
         HSTRING GetRuntimeClassName(){
-            return typename Derived::runtime_class_t::get_runtime_class_name_as_hstring();
+            return typename Derived::runtime_class_t::get_runtime_class_name().release();
         }
 
         TrustLevel GetTrustLevel(){
@@ -255,15 +246,11 @@ namespace cc_winrt{
     };
 
     // Defines a winrt_runtime class
-    template<std::wstring(*pfun_runtime_class_name)(),template<class> class DefaultInterface,template <class> class FactoryInterface,template<class> class StaticInterface, template<class> class... OtherInterfaces>
+    template<hstring(*pfun_runtime_class_name)(),template<class> class DefaultInterface,template <class> class FactoryInterface,template<class> class StaticInterface, template<class> class... OtherInterfaces>
     struct winrt_runtime_class{
-        static  HSTRING get_runtime_class_name_as_hstring(){
-            return hstring_from_wstring(pfun_runtime_class_name());
-        }
-        static  std::wstring get_runtime_class_name_as_wstring(){
+        static  hstring get_runtime_class_name(){
             return pfun_runtime_class_name();
         }
-    
     };
 
 
@@ -289,7 +276,7 @@ namespace cc_winrt{
     }
     // Template to help implement a winrt runtime class
     // You inherit from this class, providing the name of your class in derived
-    template<std::wstring(*pfun_runtime_class_name)(),class Derived, template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
+    template<hstring(*pfun_runtime_class_name)(),class Derived, template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
     struct implement_winrt_runtime_class<Derived,winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...>>
         :public implement_inspectable_interfaces<Derived,DefaultInterface,Others...>
     {
@@ -326,14 +313,7 @@ namespace cc_winrt{
 
                 static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
 
-                static  HSTRING get_runtime_class_name_as_hstring(){
-                    return hstring_from_wstring(pfun_runtime_class_name());
-                }
-                static  std::wstring get_runtime_class_name_as_wstring(){
-                    return pfun_runtime_class_name();
-                }
-
-                auto activate_instance()->cc_winrt::use_unknown<cc_winrt::InterfaceInspectable>{
+                cc_winrt::use_unknown<cc_winrt::InterfaceInspectable> activate_instance(){
                     return Derived::create().QueryInterface<cc_winrt::InterfaceInspectable>();
                 }
                 implement_factory_static_interfaces(){
@@ -342,21 +322,16 @@ namespace cc_winrt{
                         implement_factory_static_interfaces,&implement_factory_static_interfaces::activate_instance>(this);
                 }
 
-                static std::wstring get_runtime_class(){return GetRuntimeClass(runtime_class_t());}
-
         };
-        static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
-            auto w = wstring_from_hstring(hs);
-            if(w==runtime_class_t::get_runtime_class_name_as_wstring()){
+        static use_unknown<InterfaceActivationFactory> get_activation_factory(hstring hs){
+            if(hs==runtime_class_t::get_runtime_class_name()){
                 return implement_factory_static_interfaces::create().QueryInterface<InterfaceActivationFactory>();
             }
             else{
                 return nullptr;
             }
         }
-        implement_winrt_runtime_class(){
 
-        }
 
     };
 
@@ -450,10 +425,9 @@ namespace cc_winrt{
 
     }
 
-    inline use_unknown<InterfaceActivationFactory> get_activation_factory(const std::wstring id){
-        unique_hstring hs(hstring_from_wstring(id));
+    inline use_unknown<InterfaceActivationFactory> get_activation_factory(const hstring& id){
         cross_compiler_interface::portable_base* paf = nullptr;
-        auto e = ::RoGetActivationFactory(hs.get(),use_unknown<InterfaceActivationFactory>::uuid::get_windows_guid<GUID>(),reinterpret_cast<void**>(&paf));
+        auto e = ::RoGetActivationFactory(id.value(),use_unknown<InterfaceActivationFactory>::uuid::get_windows_guid<GUID>(),reinterpret_cast<void**>(&paf));
         if(e < 0){
             cross_compiler_interface::general_error_mapper::exception_from_error_code(e);
         }
@@ -552,7 +526,7 @@ namespace cc_winrt{
     }
 
 
-    template<std::wstring(*pfun_runtime_class_name)(),template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
+    template<hstring(*pfun_runtime_class_name)(),template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
     struct use_winrt_runtime_class<winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...>>
         :private detail::inspectable_holder,
         public detail::inherit_use_interfaces_linearly<DefaultInterface,Others...>
@@ -569,7 +543,7 @@ namespace cc_winrt{
 
         static use_unknown<InterfaceActivationFactory> activation_factory_interface(){
             // Cache the activation factory
-            static detail::activation_factory_holder afh_(get_activation_factory(runtime_class_t::get_runtime_class_name_as_wstring()));
+            static detail::activation_factory_holder afh_(get_activation_factory(runtime_class_t::get_runtime_class_name()));
             return afh_.af_;
 
         }

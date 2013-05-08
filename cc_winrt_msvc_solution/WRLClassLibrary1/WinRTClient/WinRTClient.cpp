@@ -14,26 +14,26 @@ struct InterfaceUriRuntimeClass
     :public cc_winrt::define_inspectable_interface<T,cc_winrt::uuid<0x9E365E57,0x48B2,0x4160,0x95,0x6F,0xC7,0x38,0x51,0x20,0xBB,0xFC>>
 {
 
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,0,HSTRING()> GetAbsoluteUri;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,1,HSTRING()> GetDisplayUri;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,2,HSTRING()> GetDomain;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,3,HSTRING()> GetExtension;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,4,HSTRING()> GetFragment;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,5,HSTRING()> GetHost;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,6,HSTRING()> GetPassword;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,7,HSTRING()> GetPath;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,8,HSTRING()> GetQuery;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,0,cc_winrt::hstring()> GetAbsoluteUri;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,1,cc_winrt::hstring()> GetDisplayUri;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,2,cc_winrt::hstring()> GetDomain;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,3,cc_winrt::hstring()> GetExtension;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,4,cc_winrt::hstring()> GetFragment;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,5,cc_winrt::hstring()> GetHost;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,6,cc_winrt::hstring()> GetPassword;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,7,cc_winrt::hstring()> GetPath;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,8,cc_winrt::hstring()> GetQuery;
 
     // Change so we don't have to define Iwwwformdecoder
     cc_winrt::cross_function<InterfaceUriRuntimeClass,9,cc_winrt::use_interface<cc_winrt::InterfaceInspectable>()> GetQueryParsed;
 
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,10,HSTRING()> GetRawUri;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,11,HSTRING()> GetSchemeName;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,12,HSTRING()> GetUserName;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,13,HSTRING()> GetPort;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,10,cc_winrt::hstring()> GetRawUri;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,11,cc_winrt::hstring()> GetSchemeName;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,12,cc_winrt::hstring()> GetUserName;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,13,cc_winrt::hstring()> GetPort;
     cc_winrt::cross_function<InterfaceUriRuntimeClass,14,boolean()> GetSuspicious;
     cc_winrt::cross_function<InterfaceUriRuntimeClass,15,boolean(PInterfaceUriRuntimeClass)> Equals;
-    cc_winrt::cross_function<InterfaceUriRuntimeClass,16,PInterfaceUriRuntimeClass(HSTRING)> CombineUri;
+    cc_winrt::cross_function<InterfaceUriRuntimeClass,16,PInterfaceUriRuntimeClass(cc_winrt::hstring)> CombineUri;
 
     InterfaceUriRuntimeClass()
         :GetAbsoluteUri(this),GetDisplayUri(this),GetDomain(this),GetExtension(this),GetFragment(this),GetHost(this),GetPassword(this),GetPath(this),
@@ -49,8 +49,8 @@ CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(InterfaceUriRuntimeClass,G
 template<class T>
 struct InterfaceUriRuntimeClassFactory:public cc_winrt::define_inspectable_interface<T,cc_winrt::uuid<0x44A9796F,0x723E,0x4FDF,0xA2,0x18,0x03,0x3E,0x75,0xB0,0xC0,0x84>>{
 
-    cc_winrt::cross_function<InterfaceUriRuntimeClassFactory,0,cc_winrt::use_unknown<InterfaceUriRuntimeClass>(HSTRING)> CreateUri;
-    cc_winrt::cross_function<InterfaceUriRuntimeClassFactory,1,cc_winrt::use_unknown<InterfaceUriRuntimeClass>(HSTRING,HSTRING)> CreateWithRelativeUri;
+    cc_winrt::cross_function<InterfaceUriRuntimeClassFactory,0,cc_winrt::use_unknown<InterfaceUriRuntimeClass>(cc_winrt::hstring)> CreateUri;
+    cc_winrt::cross_function<InterfaceUriRuntimeClassFactory,1,cc_winrt::use_unknown<InterfaceUriRuntimeClass>(cc_winrt::hstring,cc_winrt::hstring)> CreateWithRelativeUri;
 
 
     InterfaceUriRuntimeClassFactory()
@@ -60,7 +60,7 @@ struct InterfaceUriRuntimeClassFactory:public cc_winrt::define_inspectable_inter
 
 CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(InterfaceUriRuntimeClassFactory,CreateUri,CreateWithRelativeUri);
 
-inline  std::wstring FoundationUri(){return L"Windows.Foundation.Uri";}
+inline  cc_winrt::hstring FoundationUri(){return L"Windows.Foundation.Uri";}
 typedef cc_winrt::winrt_runtime_class<FoundationUri,InterfaceUriRuntimeClass,InterfaceUriRuntimeClassFactory,cc_winrt::InterfaceInspectable_> ClassUri_t;
 
 
@@ -70,11 +70,10 @@ typedef cc_winrt::use_winrt_runtime_class<ClassUri_t> CUri;
 int main(){
     cc_winrt::unique_ro_initialize init;
 
-    cc_winrt::unique_hstring hs(cc_winrt::hstring_from_wstring(L"http://www.microsoft.com"));
-    CUri uri(hs.get());
+    CUri uri(L"http://www.microsoft.com");
    
 
-    std::wcout << L"Domain name: " << cc_winrt::wstring_from_hstring(uri.GetDomain()) << std::endl;
+    std::wcout << L"Domain name: " << uri.GetDomain().c_str() << std::endl;
 
 
 
