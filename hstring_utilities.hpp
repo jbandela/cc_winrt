@@ -6,7 +6,7 @@
 namespace cc_winrt{
 
     // Preserves HSTRING
-    inline std::wstring WStringFromHSTRING(HSTRING h){
+    inline std::wstring wstring_from_hstring(const HSTRING& h){
         if( ::WindowsIsStringEmpty(h)){
             return std::wstring();
         }
@@ -17,7 +17,7 @@ namespace cc_winrt{
         return r;
     }  
     // Destructive to HSTRING
-    inline std::wstring WStringFromHSTRING(HSTRING&& h){
+    inline std::wstring wstring_from_hstring(HSTRING&& h){
         if( ::WindowsIsStringEmpty(h)){
             return std::wstring();
         }
@@ -29,7 +29,7 @@ namespace cc_winrt{
         return r;
     }
 
-    inline HSTRING HSTRINGFromWString(const std::wstring& w){
+    inline HSTRING hstring_from_wstring(const std::wstring& w){
         HSTRING r = nullptr;
         auto e = ::WindowsCreateString(w.c_str(),w.size(),&r);
         if(e < 0){
@@ -48,7 +48,7 @@ namespace cc_winrt{
             return hs;
         }
 
-        HSTRING get(){return hs_;}
+        HSTRING& get(){return hs_;}
         HSTRING release(){
             HSTRING hs = hs_;
             hs_ = empty_string();

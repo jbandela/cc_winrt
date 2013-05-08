@@ -24,6 +24,26 @@ CROSS_COMPILER_INTERFACE_DEFINE_TYPE_INFORMATION(TrustLevel);
 
 namespace cc_winrt{
 
+
+    struct unique_ro_initialize{
+        unique_ro_initialize(RO_INIT_TYPE rinit = default_init()){
+            auto e = ::RoInitialize(rinit);
+            if(e < 0){
+                cross_compiler_interface::general_error_mapper::exception_from_error_code(e);
+            }
+        }
+        ~unique_ro_initialize(){
+            ::RoUninitialize();
+        }
+
+        // Allows us to change the threading model
+        // WARNING: NOT multithread safe
+        static RO_INIT_TYPE& default_init(){
+            static RO_INIT_TYPE init_ = RO_INIT_MULTITHREADED;
+            return init_;
+        }
+    };
+
     // Use the following templates from cross_compiler_interface
     using cross_compiler_interface::cross_function;
     using cross_compiler_interface::use_unknown;
@@ -211,7 +231,7 @@ namespace cc_winrt{
         }
 
         HSTRING GetRuntimeClassName(){
-            return HSTRINGFromWString(RuntimeClassName<typename Derived::runtime_class_t>::Get());
+            return hstring_from_wstring(RuntimeClassName<typename Derived::runtime_class_t>::Get());
         }
 
         TrustLevel GetTrustLevel(){
@@ -319,7 +339,7 @@ namespace cc_winrt{
 
         };
         static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
-            auto w = WStringFromHSTRING(hs);
+            auto w = wstring_from_hstring(hs);
             if(w==RuntimeClassName<runtime_class_t>::Get()){
                 return implement_factory_static_interfaces::create().QueryInterface<InterfaceActivationFactory>();
             }
@@ -424,7 +444,7 @@ namespace cc_winrt{
     }
 
     inline use_unknown<InterfaceActivationFactory> get_activation_factory(const std::wstring id){
-        unique_hstring hs(HSTRINGFromWString(id));
+        unique_hstring hs(hstring_from_wstring(id));
         cross_compiler_interface::portable_base* paf = nullptr;
         auto e = ::RoGetActivationFactory(hs.get(),use_unknown<InterfaceActivationFactory>::uuid::get_windows_guid<GUID>(),reinterpret_cast<void**>(&paf));
         if(e < 0){
@@ -510,7 +530,20 @@ namespace cc_winrt{
             cross_compiler_interface::portable_base* pb = i.get_portable_base();
             return helper::overloaded_call(pb,p...).QueryInterface<InterfaceInspectable>();
         }
+
+        // Holds factory and a ro_init call
+        // This assures that we won't be destructing after last RoInitializeCalled
+        struct activation_factory_holder{
+
+            unique_ro_initialize init_;
+            use_unknown<InterfaceActivationFactory> af_;
+
+            activation_factory_holder(use_unknown<InterfaceActivationFactory> af):af_(af){};
+
+
+        };
     }
+
 
     template<template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
     struct use_winrt_runtime_class<winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
@@ -528,8 +561,9 @@ namespace cc_winrt{
         }
 
         static use_unknown<InterfaceActivationFactory> activation_factory_interface(){
-            static use_unknown<InterfaceActivationFactory> af_(get_activation_factory(RuntimeClassName<runtime_class_t>::Get()));
-            return af_;
+            // Cache the activation factory
+            static detail::activation_factory_holder afh_(get_activation_factory(RuntimeClassName<runtime_class_t>::Get()));
+            return afh_.af_;
 
         }
 
