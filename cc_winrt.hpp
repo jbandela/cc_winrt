@@ -51,6 +51,9 @@ namespace cc_winrt{
     using cross_compiler_interface::implement_interface;
     using cross_compiler_interface::uuid;
 
+    typedef cross_compiler_interface::cross_compiler_interface_error_base hresult_error;
+    typedef cross_compiler_interface::general_error_mapper error_mapper;
+
     namespace detail{
 
         // A custom_cross_function for GetIids. 
