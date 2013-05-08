@@ -72,18 +72,14 @@ int main(){
         // Initialize/deinitialize WinRT
         cc_winrt::unique_ro_initialize init;
 
-        CUri uri(L"http : //www.microsoft.com");
+        CUri uri(L"http://www.microsoft.com");
 
         std::wcout << L"Domain name: " << uri.GetDomain().c_str() << std::endl;
     }
 
-    catch(cc_winrt::hresult_error& e){
-        std::cerr << "Error. Error Code: " << std::hex << "0x" << e.get_error_code() << " - " << e.what() << "\n";
-    }  
-    // General errors
     catch(std::exception& e){
-        std::cerr << "Error :" << e.what() << "\n";
-    }
+        std::cerr << "Error. " << e.what() << "\n";
+    }  
 }
 
 // Below is the original program
