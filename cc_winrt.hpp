@@ -54,11 +54,11 @@ namespace cc_winrt{
   
 
 
-    template<class WRC>
-    struct RuntimeClassName{
-        // Specialize for each winrt_runtime_class
-        // std::wstring Get(){return L"Example.ClassName";}
-    };
+    //template<class WRC>
+    //struct RuntimeClassName{
+    //    // Specialize for each winrt_runtime_class
+    //    // std::wstring Get(){return L"Example.ClassName";}
+    //};
 
     namespace detail{
 
@@ -231,7 +231,7 @@ namespace cc_winrt{
         }
 
         HSTRING GetRuntimeClassName(){
-            return hstring_from_wstring(RuntimeClassName<typename Derived::runtime_class_t>::Get());
+            return typename Derived::runtime_class_t::get_runtime_class_name_as_hstring();
         }
 
         TrustLevel GetTrustLevel(){
@@ -255,8 +255,16 @@ namespace cc_winrt{
     };
 
     // Defines a winrt_runtime class
-    template<template<class> class DefaultInterface,template <class> class FactoryInterface,template<class> class StaticInterface, template<class> class... OtherInterfaces>
-    struct winrt_runtime_class{};
+    template<std::wstring(*pfun_runtime_class_name)(),template<class> class DefaultInterface,template <class> class FactoryInterface,template<class> class StaticInterface, template<class> class... OtherInterfaces>
+    struct winrt_runtime_class{
+        static  HSTRING get_runtime_class_name_as_hstring(){
+            return hstring_from_wstring(pfun_runtime_class_name());
+        }
+        static  std::wstring get_runtime_class_name_as_wstring(){
+            return pfun_runtime_class_name();
+        }
+    
+    };
 
 
 
@@ -277,16 +285,17 @@ namespace cc_winrt{
             :public implement_inspectable_interfaces<Derived,InterfaceActivationFactory,StaticInterface>{
 
         };
+
     }
     // Template to help implement a winrt runtime class
     // You inherit from this class, providing the name of your class in derived
-    template<class Derived, template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
-    struct implement_winrt_runtime_class<Derived,winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
+    template<std::wstring(*pfun_runtime_class_name)(),class Derived, template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
+    struct implement_winrt_runtime_class<Derived,winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...>>
         :public implement_inspectable_interfaces<Derived,DefaultInterface,Others...>
     {
 
         // The runtime class default interface
-        typedef winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
+        typedef winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
         cross_compiler_interface::implement_interface<DefaultInterface>* default_interface(){
             return this->get_implementation<DefaultInterface>();
 
@@ -294,16 +303,14 @@ namespace cc_winrt{
 
         static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
 
-        static         HSTRING GetRuntimeClassName(){
-            return HSTRINGFromWString(GetRuntimeClass(runtime_class_t()));
-        }
+
 
 
 
         struct implement_factory_static_interfaces
             :public detail::implement_factory_static_helper<typename Derived::ImplementFactoryStaticInterfaces,FactoryInterface,StaticInterface>{
 
-                typedef winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
+                typedef winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
 
                 cross_compiler_interface::implement_interface<FactoryInterface>* factory_interface(){
                     return this->get_implementation<FactoryInterface>();
@@ -319,11 +326,11 @@ namespace cc_winrt{
 
                 static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
 
-                static HSTRING GetRuntimeClassName(){
-                    return HSTRINGFromWString(GetRuntimeClass(runtime_class_t()));
+                static  HSTRING get_runtime_class_name_as_hstring(){
+                    return hstring_from_wstring(pfun_runtime_class_name());
                 }
-                static std::wstring GetRuntimeClass(){
-                    return GetRuntimeClass(runtime_class_t());
+                static  std::wstring get_runtime_class_name_as_wstring(){
+                    return pfun_runtime_class_name();
                 }
 
                 auto activate_instance()->cc_winrt::use_unknown<cc_winrt::InterfaceInspectable>{
@@ -340,7 +347,7 @@ namespace cc_winrt{
         };
         static use_unknown<InterfaceActivationFactory> get_activation_factory(HSTRING hs){
             auto w = wstring_from_hstring(hs);
-            if(w==RuntimeClassName<runtime_class_t>::Get()){
+            if(w==runtime_class_t::get_runtime_class_name_as_wstring()){
                 return implement_factory_static_interfaces::create().QueryInterface<InterfaceActivationFactory>();
             }
             else{
@@ -545,12 +552,12 @@ namespace cc_winrt{
     }
 
 
-    template<template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
-    struct use_winrt_runtime_class<winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...>>
+    template<std::wstring(*pfun_runtime_class_name)(),template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
+    struct use_winrt_runtime_class<winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...>>
         :private detail::inspectable_holder,
         public detail::inherit_use_interfaces_linearly<DefaultInterface,Others...>
     {
-        typedef winrt_runtime_class<DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
+        typedef winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
         cross_compiler_interface::use_unknown<DefaultInterface> default_interface(){
             return this->get_implementation<DefaultInterface>();
 
@@ -562,7 +569,7 @@ namespace cc_winrt{
 
         static use_unknown<InterfaceActivationFactory> activation_factory_interface(){
             // Cache the activation factory
-            static detail::activation_factory_holder afh_(get_activation_factory(RuntimeClassName<runtime_class_t>::Get()));
+            static detail::activation_factory_holder afh_(get_activation_factory(runtime_class_t::get_runtime_class_name_as_wstring()));
             return afh_.af_;
 
         }

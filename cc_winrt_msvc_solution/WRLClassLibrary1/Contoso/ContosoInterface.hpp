@@ -31,14 +31,11 @@ struct InterfaceCalculator:public cc_winrt::define_inspectable_interface<T,
 
 CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(InterfaceCalculator,Add);
 
-typedef cc_winrt::winrt_runtime_class<InterfaceCalculator,cc_winrt::InterfaceActivationFactory,cc_winrt::InterfaceInspectable_> Calculator_t;
+
+inline std::wstring ContosoCalculatorName(){return L"Contoso.Calculator";}
+
+typedef cc_winrt::winrt_runtime_class<ContosoCalculatorName,InterfaceCalculator,cc_winrt::InterfaceActivationFactory,cc_winrt::InterfaceInspectable_> Calculator_t;
 
 
-// Defines the ClassName
-namespace cc_winrt{
-    template<>
-    struct RuntimeClassName<Calculator_t>{
-        static std::wstring Get(){return L"Contoso.Calculator";}
-    };
-}
+
 

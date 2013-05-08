@@ -60,15 +60,9 @@ struct InterfaceUriRuntimeClassFactory:public cc_winrt::define_inspectable_inter
 
 CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(InterfaceUriRuntimeClassFactory,CreateUri,CreateWithRelativeUri);
 
-typedef cc_winrt::winrt_runtime_class<InterfaceUriRuntimeClass,InterfaceUriRuntimeClassFactory,cc_winrt::InterfaceInspectable_> ClassUri_t;
+inline  std::wstring FoundationUri(){return L"Windows.Foundation.Uri";}
+typedef cc_winrt::winrt_runtime_class<FoundationUri,InterfaceUriRuntimeClass,InterfaceUriRuntimeClassFactory,cc_winrt::InterfaceInspectable_> ClassUri_t;
 
-namespace cc_winrt{
-    template<>
-    struct RuntimeClassName<ClassUri_t>{
-        static std::wstring Get(){return L"Windows.Foundation.Uri";}
-    };
-
-}
 
 typedef cc_winrt::use_winrt_runtime_class<ClassUri_t> CUri;
 
