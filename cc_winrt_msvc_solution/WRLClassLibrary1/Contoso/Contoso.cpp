@@ -3,7 +3,6 @@
 
 struct ImplementCalculator:public cc_winrt::implement_winrt_runtime_class<ImplementCalculator,Calculator_t>{
 
-    struct ImplementFactoryStaticInterfaces:public implement_factory_static_interfaces{};
 
     ImplementCalculator(){
         default_interface()->Add = [](int a,int b){ 
