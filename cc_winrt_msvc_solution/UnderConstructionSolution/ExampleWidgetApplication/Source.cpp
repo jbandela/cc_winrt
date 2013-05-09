@@ -10,22 +10,27 @@ int main(Platform::Array<Platform::String^>^ args)
     CxxCXWidget^ defaultConstructedCxxCXWidget = ref new CxxCXWidget();
     WRLWidget^   defaultConstructedWrlWidget   = ref new WRLWidget();
 
-    Widget w;
 
-    auto a = w.GetNumber();
-
-    auto i = defaultConstructedWrlWidget->GetNumber();
 
     // Demonstrate factory construction of both:
     CxxCXWidget^ factoryConstructedCxxCXWidget = ref new CxxCXWidget(42);
     WRLWidget^   factoryConstructedWrlWidget   = ref new WRLWidget(42);
 
+
+    // Demonstrate using cc_winrt
+
+    // Default constructed
+    Widget w;
+
+    // Call Function - notice real return
+    auto a = w.GetNumber();
+
+    // Constructed with int parameter
     Widget w2(42);
     auto a2 = w2.GetNumber();
 
-    // Another supported constructor
+    // We have another constructor that takes 2 parameters
     Widget w3(42,7);
     auto a3 = w3.GetNumber();
 
-    auto i2 = factoryConstructedWrlWidget->GetNumber();
 }

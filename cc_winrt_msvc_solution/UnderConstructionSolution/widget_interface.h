@@ -1,5 +1,7 @@
 #include <C:\Users\jrb\Source\Repos\cc_winrt\cc_winrt.hpp>
 
+// Define the interface
+// Same syntax as cross_compiler_call
 template<class T>
 struct InterfaceWidget:public cc_winrt::define_inspectable_interface<T,cross_compiler_interface::uuid<0xada06666,0x5abd,0x4691,0x8a,0x44,0x56,0x70,0x3e,0x02,0x0d,0x64>>
 {
@@ -8,8 +10,11 @@ struct InterfaceWidget:public cc_winrt::define_inspectable_interface<T,cross_com
     InterfaceWidget():GetNumber(this){}
 };
 
+// Define the introspection/reflection type information
 CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(InterfaceWidget,GetNumber);
 
+
+// Define the factory
 template<class T>
 struct InterfaceWidgetFactory:public cc_winrt::define_inspectable_interface<T,cc_winrt::uuid<0x5b197688,0x2f57,0x4d01,0x92,0xcd,0xa8,0x88,0xf1,0x0d,0xcd,0x90>>
 {
@@ -19,9 +24,15 @@ struct InterfaceWidgetFactory:public cc_winrt::define_inspectable_interface<T,cc
     InterfaceWidgetFactory():CreateInstance1(this),CreateInstance2(this){}
 
 };
+
+// Define the introspection/reflection type information
 CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(InterfaceWidgetFactory,CreateInstance1,CreateInstance2);
 
+// Tells what the RuntimeClassName is
 inline cc_winrt::hstring WidgetRuntimeClassName(){return L"WRLWidgetComponent.Widget";}
+
+// Define a runtime class
 typedef cc_winrt::winrt_runtime_class<WidgetRuntimeClassName,InterfaceWidget,InterfaceWidgetFactory,cc_winrt::InterfaceInspectable> Widget_t;
 
+// Define a typedef for use_winrt_runtime_class
 typedef cc_winrt::use_winrt_runtime_class<Widget_t> Widget;
