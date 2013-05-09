@@ -383,8 +383,8 @@ namespace cc_winrt{
                 implement_factory_static_interfaces(){
 
 
-                    auto memp = cross_compiler_interface::type_name_getter<std::remove_reference<decltype(*factory_interface())>::type>::get_ptrs_to_members();
-                    typedef typename detail::forward_to_factory_to_constructor<typename cross_compiler_interface::type_name_getter<cross_compiler_interface::implement_interface<FactoryInterface>>::functions>::type f_t;
+                    auto memp = cross_compiler_interface::type_information<cross_compiler_interface::implement_interface<FactoryInterface>>::get_ptrs_to_members();
+                    typedef typename detail::forward_to_factory_to_constructor<typename cross_compiler_interface::type_information<cross_compiler_interface::implement_interface<FactoryInterface>>::functions>::type f_t;
                     f_t::set(*this,memp,*factory_interface());
                     activation_factory_interface()->ActivateInstance.template set_mem_fn<
                         implement_factory_static_interfaces,&implement_factory_static_interfaces::activate_instance>(this);
