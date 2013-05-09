@@ -22,6 +22,8 @@ int main(Platform::Array<Platform::String^>^ args)
 
     Widget w2(42);
     auto a2 = w2.GetNumber();
+
+    // Another supported constructor
     Widget w3(42,7);
     auto a3 = w3.GetNumber();
 

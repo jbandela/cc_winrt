@@ -24,6 +24,11 @@ CROSS_COMPILER_INTERFACE_DEFINE_TYPE_INFORMATION(TrustLevel);
 
 namespace cc_winrt{
 
+    // Implementation of object count 
+    inline HRESULT dll_can_unload_now(){
+        auto count = cross_compiler_interface::object_counter::get().get_count();
+        return count == 0 ? S_OK : S_FALSE;
+    }
 
     struct unique_ro_initialize{
         unique_ro_initialize(RO_INIT_TYPE rinit = default_init()){
