@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <AppContainerApplication>true</AppContainerApplication>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <GenerateManifest>false</GenerateManifest>
+    <Keyword>Win32Proj</Keyword>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <ProjectGuid>{c08d65c3-6cf4-4600-8ed7-ed44bc67acce}</ProjectGuid>
+    <ProjectName>WRLWidgetComponent</ProjectName>
+    <RootNamespace>WRLWidgetComponent</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalUsingDirectories>$(WindowsSDK_MetadataPath);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>WINAPI_FAMILY=WINAPI_PARTITION_APP;_USRDLL;_CRT_SECURE_NO_WARNINGS=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>runtimeobject.lib;user32.lib;kernel32.lib</AdditionalDependencies>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <Midl>
+      <AdditionalMetadataDirectories>$(WindowsSDK_MetadataPath)</AdditionalMetadataDirectories>
+      <AdditionalOptions>/ns_prefix %(AdditionalOptions)</AdditionalOptions>
+      <EnableWindowsRuntime>true</EnableWindowsRuntime>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Module.cpp" />
+    <ClCompile Include="Widget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="WRLWidgetComponent.idl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <_MdMergeOutput Include="$(OutDir)\$(ProjectName).winmd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\widget_interface.h" />
+  </ItemGroup>
+  <Target Name="GetResolvedWinMD" Returns="@(WinMDFullPath)">
+    <ItemGroup>
+      <Link Include="tmp" Condition="'@(Link)'==''">
+        <DeleteSoon>true</DeleteSoon>
+      </Link>
+      <WinMDFullPath Include="@(Link-&gt;Metadata('WindowsMetadataFile')-&gt;FullPath()-&gt;Distinct()-&gt;ClearMetadata())">
+        <TargetPath>$([System.IO.Path]::GetFileName('%(Link.WindowsMetadataFile)'))</TargetPath>
+        <Primary>true</Primary>
+      </WinMDFullPath>
+      <WinMDFullPath>
+        <Implementation>$(WinMDImplementationPath)$(TargetName)$(TargetExt)</Implementation>
+        <FileType>winmd</FileType>
+        <WinMDFile>true</WinMDFile>
+        <ProjectType>$(ConfigurationType)</ProjectType>
+      </WinMDFullPath>
+      <Link Remove="@(Link)" Condition="'%(Link.DeleteSoon)' == 'true'" />
+    </ItemGroup>
+  </Target>
+</Project>

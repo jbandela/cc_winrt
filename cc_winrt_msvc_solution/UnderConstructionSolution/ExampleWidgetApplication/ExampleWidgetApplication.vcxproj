@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5992b65c-71bd-4a5f-a261-6ec0b3fdf527}</ProjectGuid>
+    <RootNamespace>ExampleWidgetApplication</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <PackageCertificateKeyFile>ExampleWidgetApplication_TemporaryKey.pfx</PackageCertificateKeyFile>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <None Include="ExampleWidgetApplication_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Logo.png" />
+    <Image Include="Assets\SmallLogo.png" />
+    <Image Include="Assets\StoreLogo.png" />
+    <Image Include="Assets\SplashScreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CxxCXWidgetComponent\CxxCXWidgetComponent.vcxproj">
+      <Project>{2c629089-454b-4c47-aa62-a0b03a14559c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\WRLWidgetComponent\WRLWidgetComponent.vcxproj">
+      <Project>{c08d65c3-6cf4-4600-8ed7-ed44bc67acce}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

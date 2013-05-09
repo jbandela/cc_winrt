@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Widget.cpp" />
+    <ClCompile Include="Module.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="WRLWidgetComponent.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\widget_interface.h" />
+  </ItemGroup>
+</Project>

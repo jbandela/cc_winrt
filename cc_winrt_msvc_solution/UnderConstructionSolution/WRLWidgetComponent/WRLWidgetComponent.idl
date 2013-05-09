@@ -1,0 +1,32 @@
+import "inspectable.idl";
+
+#define COMPONENT_VERSION 1.0
+
+namespace WRLWidgetComponent
+{
+    runtimeclass Widget;
+
+    [exclusiveto(Widget)]
+    [uuid(ada06666-5abd-4691-8a44-56703e020d64)]
+    [version(1.0)]
+    interface IWidget : IInspectable
+    {
+        HRESULT GetNumber([out] [retval] int* number);
+    }
+
+    [exclusiveto(Widget)]
+    [uuid(5b197688-2f57-4d01-92cd-a888f10dcd90)]
+    [version(1.0)]
+    interface IWidgetFactory : IInspectable
+    {
+        HRESULT CreateInstance4([in] int value,[out] [retval] Widget** widget);
+    }
+    
+    [activatable(1.0)]
+    [activatable(IWidgetFactory, 1.0)]
+    [version(1.0)]
+    runtimeclass Widget
+    {
+        [default] interface IWidget;
+    }
+}

@@ -301,27 +301,6 @@ namespace cc_winrt{
 
             }
         };  
-        //template<class CF, class R, class P1>
-        //struct factory_to_constructor_helper<CF,R(P1)>{
-        //    template<class ImpFactHelper, class MPS,class Interface>
-
-        //    static void set(ImpFactHelper& helper, MPS& m,Interface& i){
-        //        auto ptm = m.get<CF>();
-        //        (i.*ptm). template set_mem_fn<ImpFactHelper,&ImpFactHelper:: template activate_instance_parms1<P1>>(&helper);
-        //   
-        //    }
-        //};
-        //template<class CF, class R >
-        //struct factory_to_constructor_helper<CF,R()>{
-        //    template<class ImpFactHelper, class MPS,class Interface>
-
-        //    static void set(ImpFactHelper& helper, MPS& m,Interface& i){
-        //        auto ptm = m.get<CF>();
-        //        (i.*ptm). template set_mem_fn<ImpFactHelper,&ImpFactHelper::activate_instance>(&helper);
-        //   
-        //    }
-        //};
-
 
         template<class... CF>
         struct factory_to_constructor{};
@@ -415,6 +394,9 @@ namespace cc_winrt{
                 
 
         };
+
+        typedef implement_factory_static_interfaces ImplementFactoryStaticInterfaces;
+
         static use_unknown<InterfaceActivationFactory> get_activation_factory(hstring hs){
             if(hs==runtime_class_t::get_runtime_class_name()){
                 return implement_factory_static_interfaces::create().QueryInterface<InterfaceActivationFactory>();
