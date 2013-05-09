@@ -292,13 +292,13 @@ namespace cc_winrt{
 
             static void set(ImpFactHelper& helper, MPS& m,Interface& i){
                 auto ptm = m.get<CF>();
-         //       (i.*ptm). template set_mem_fn<ImpFactHelper,&ImpFactHelper:: template activate_instance_parms<Parms...>>(&helper);
-                (i.*ptm) = [&helper](Parms... p){R ret;
-                auto t = helper.activate_instance_parms(p...);
-                caster(ret,t);
-                return ret;
+                (i.*ptm) = [&helper](Parms... p)->R{
+                    R ret;
+                    auto t = helper.activate_instance_parms(p...);
+                    caster(ret,t);
+                    return ret;
                 };
-           
+
             }
         };  
         //template<class CF, class R, class P1>
@@ -397,21 +397,18 @@ namespace cc_winrt{
                 cc_winrt::use_unknown<cc_winrt::InterfaceInspectable> activate_instance_parms(T... t){
                     return Derived::create(t...).QueryInterface<cc_winrt::InterfaceInspectable>();
                 }
-                //template<class T1>
-                //cc_winrt::use_unknown<cc_winrt::InterfaceInspectable> activate_instance_parms1(T1 t){
-                //    return Derived::create(t).QueryInterface<cc_winrt::InterfaceInspectable>();
-                //}
+
                 cc_winrt::use_unknown<cc_winrt::InterfaceInspectable> activate_instance(){
                     return Derived::create().QueryInterface<cc_winrt::InterfaceInspectable>();
                 }
                 implement_factory_static_interfaces(){
 
-                    activation_factory_interface()->ActivateInstance.template set_mem_fn<
-                        implement_factory_static_interfaces,&implement_factory_static_interfaces::activate_instance>(this);
 
                     auto memp = cross_compiler_interface::type_name_getter<std::remove_reference<decltype(*factory_interface())>::type>::get_ptrs_to_members();
                     typedef typename detail::forward_to_factory_to_constructor<typename cross_compiler_interface::type_name_getter<cross_compiler_interface::implement_interface<FactoryInterface>>::functions>::type f_t;
                     f_t::set(*this,memp,*factory_interface());
+                    activation_factory_interface()->ActivateInstance.template set_mem_fn<
+                        implement_factory_static_interfaces,&implement_factory_static_interfaces::activate_instance>(this);
                 }
 
                
