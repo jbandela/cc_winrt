@@ -276,6 +276,83 @@ namespace cc_winrt{
 
         };
 
+        template<template<class> class Iface, class T>
+        void caster(use_unknown<Iface>& r, T& t){
+            r = t.QueryInterface<Iface>();
+        }
+
+
+        // Helpers for using constructors to automatically map interface
+        template<class CF, class F>
+        struct factory_to_constructor_helper{};
+
+        template<class CF, class R, class... Parms>
+        struct factory_to_constructor_helper<CF,R(Parms...)>{
+            template<class ImpFactHelper, class MPS,class Interface>
+
+            static void set(ImpFactHelper& helper, MPS& m,Interface& i){
+                auto ptm = m.get<CF>();
+         //       (i.*ptm). template set_mem_fn<ImpFactHelper,&ImpFactHelper:: template activate_instance_parms<Parms...>>(&helper);
+                (i.*ptm) = [&helper](Parms... p){R ret;
+                auto t = helper.activate_instance_parms(p...);
+                caster(ret,t);
+                return ret;
+                };
+           
+            }
+        };  
+        //template<class CF, class R, class P1>
+        //struct factory_to_constructor_helper<CF,R(P1)>{
+        //    template<class ImpFactHelper, class MPS,class Interface>
+
+        //    static void set(ImpFactHelper& helper, MPS& m,Interface& i){
+        //        auto ptm = m.get<CF>();
+        //        (i.*ptm). template set_mem_fn<ImpFactHelper,&ImpFactHelper:: template activate_instance_parms1<P1>>(&helper);
+        //   
+        //    }
+        //};
+        //template<class CF, class R >
+        //struct factory_to_constructor_helper<CF,R()>{
+        //    template<class ImpFactHelper, class MPS,class Interface>
+
+        //    static void set(ImpFactHelper& helper, MPS& m,Interface& i){
+        //        auto ptm = m.get<CF>();
+        //        (i.*ptm). template set_mem_fn<ImpFactHelper,&ImpFactHelper::activate_instance>(&helper);
+        //   
+        //    }
+        //};
+
+
+        template<class... CF>
+        struct factory_to_constructor{};
+
+        template<class First>
+        struct factory_to_constructor<First>{
+            template<class ImpFactHelper, class MPS,class Interface>
+            static void set(ImpFactHelper& helper, MPS& m,Interface& i){
+                factory_to_constructor_helper<First, typename First::function_signature>::set(helper,m,i);
+            }
+        };
+
+        template<class First, class... Rest>
+        struct factory_to_constructor<First,Rest...>{
+            template<class ImpFactHelper, class MPS,class Interface>
+            static void set(ImpFactHelper& helper, MPS& m,Interface& i){
+                factory_to_constructor_helper<First, typename First::function_signature>::set(helper,m,i);
+                factory_to_constructor<Rest...>::set(helper,m,i);
+            }
+
+
+        };
+
+        template<class TypesList>
+        struct forward_to_factory_to_constructor{};
+
+        template<class... T>
+        struct forward_to_factory_to_constructor<cross_compiler_interface::type_list<T...>>{
+            typedef factory_to_constructor<T...> type;
+        };
+
     }
     // Template to help implement a winrt runtime class
     // You inherit from this class, providing the name of your class in derived
@@ -310,12 +387,20 @@ namespace cc_winrt{
                     return this->get_implementation<InterfaceActivationFactory>();
                 }
 
-                cross_compiler_interface::implement_interface<StaticInterface> static_interface(){
+                cross_compiler_interface::implement_interface<StaticInterface>* static_interface(){
                     return this->get_implementation<StaticInterface>();
                 }
 
                 static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
 
+                template<class... T>
+                cc_winrt::use_unknown<cc_winrt::InterfaceInspectable> activate_instance_parms(T... t){
+                    return Derived::create(t...).QueryInterface<cc_winrt::InterfaceInspectable>();
+                }
+                //template<class T1>
+                //cc_winrt::use_unknown<cc_winrt::InterfaceInspectable> activate_instance_parms1(T1 t){
+                //    return Derived::create(t).QueryInterface<cc_winrt::InterfaceInspectable>();
+                //}
                 cc_winrt::use_unknown<cc_winrt::InterfaceInspectable> activate_instance(){
                     return Derived::create().QueryInterface<cc_winrt::InterfaceInspectable>();
                 }
@@ -323,7 +408,14 @@ namespace cc_winrt{
 
                     activation_factory_interface()->ActivateInstance.template set_mem_fn<
                         implement_factory_static_interfaces,&implement_factory_static_interfaces::activate_instance>(this);
+
+                    auto memp = cross_compiler_interface::type_name_getter<std::remove_reference<decltype(*factory_interface())>::type>::get_ptrs_to_members();
+                    typedef typename detail::forward_to_factory_to_constructor<typename cross_compiler_interface::type_name_getter<cross_compiler_interface::implement_interface<FactoryInterface>>::functions>::type f_t;
+                    f_t::set(*this,memp,*factory_interface());
                 }
+
+               
+                
 
         };
         static use_unknown<InterfaceActivationFactory> get_activation_factory(hstring hs){
