@@ -355,6 +355,15 @@ namespace cc_winrt{
         static TrustLevel GetTrustLevel(){return TrustLevel::BaseTrust;}
 
 
+        void map_default_implementation_to_member_functions(){
+
+            this->get_implementation<DefaultInterface>()->map_to_member_functions_no_prefix(static_cast<Derived*>(this));
+
+        }
+
+        implement_winrt_runtime_class(){
+            static_cast<Derived*>(this)->map_default_implementation_to_member_functions();    
+        }
 
 
 

@@ -6,15 +6,16 @@ struct ImplementWidget :public cc_winrt::implement_winrt_runtime_class<Implement
 {
 
     int number_;
-    // Sets the implementation for the cross_functions
+    
+    // Implementation of the interface
     std::int32_t GetNumber(){
         return number_;
     }
 
     // cc_winrt will automatically map from factory interface to Constructors
-    ImplementWidget():number_(0){default_interface()->map_to_member_functions_no_prefix(this);}
-    ImplementWidget(std::int32_t i):number_(i){default_interface()->map_to_member_functions_no_prefix(this);}
-    ImplementWidget(std::int32_t i,std::int32_t j):number_(i+j){default_interface()->map_to_member_functions_no_prefix(this);}
+    ImplementWidget():number_(0){ }
+    ImplementWidget(std::int32_t i):number_(i){}
+    ImplementWidget(std::int32_t i,std::int32_t j):number_(i+j){}
 
 };
 

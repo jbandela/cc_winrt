@@ -3,12 +3,8 @@
 
 struct ImplementCalculator:public cc_winrt::implement_winrt_runtime_class<ImplementCalculator,Calculator_t>{
 
-
-    ImplementCalculator(){
-        default_interface()->Add = [](int a,int b){ 
-            return a + b; 
-        };
-
+    std::int32_t Add(std::int32_t a,std::int32_t b){
+        return a + b;
     }
 
 };
