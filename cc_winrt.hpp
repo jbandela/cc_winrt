@@ -662,3 +662,8 @@ namespace cc_winrt{
 
 CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(cc_winrt::InterfaceInspectable,GetIids,GetRuntimeClassName,GetTrustLevel);
 CROSS_COMPILER_INTERFACE_DEFINE_INTERFACE_INFORMATION(cc_winrt::InterfaceActivationFactory,ActivateInstance);
+
+
+#define CC_WINRT_CONSTRUCT_INSPECTABLE_INTERFACE(T,...)   \
+        CROSS_COMPILER_INTERFACE_HELPER_CONSTRUCT_INTERFACE(T, cc_winrt::define_inspectable_interface<Type CROSS_COMPILER_INTERFACE_COMMA T::uuid>, __VA_ARGS__)
+
