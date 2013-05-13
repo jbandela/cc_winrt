@@ -118,7 +118,7 @@ int main(){
 
         std::wcout << L"Absolute Canonical Uri: " << uri.AbsoluteCanonicalUri().c_str() << std::endl;
 
-        std::wcout << uri.static_interface().EscapeComponent(L"http://www.test.com/this is a test").c_str();
+        std::wcout << CUri::static_interface().EscapeComponent(L"http://www.test.com/this is a test").c_str();
         
     }
 

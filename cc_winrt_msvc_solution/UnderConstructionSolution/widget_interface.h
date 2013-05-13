@@ -1,4 +1,4 @@
-#include <C:\Users\jrb\Source\Repos\cc_winrt\cc_winrt.hpp>
+#include "..\..\..\cc_winrt.hpp"
 
 // Define the Interface for the Widget
 struct InterfaceWidget{

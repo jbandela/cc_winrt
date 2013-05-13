@@ -4,9 +4,9 @@
 
 
  /* File created by MIDL compiler version 8.00.0595 */
-/* at Sat May 11 14:18:25 2013
+/* at Mon May 13 09:33:33 2013
  */
-/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\WRLWidgetComponent.idl-a7441994:
+/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\WRLWidgetComponent.idl-1b4a2c78:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0595 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
@@ -275,8 +275,13 @@ EXTERN_C const IID IID___x_ABI_CWRLWidgetComponent_CIWidgetFactory;
             IWidgetFactory : public IInspectable
             {
             public:
-                virtual HRESULT STDMETHODCALLTYPE CreateInstance4( 
+                virtual HRESULT STDMETHODCALLTYPE CreateInstance1( 
                     /* [in] */ int value,
+                    /* [out][retval] */ ABI::WRLWidgetComponent::IWidget **widget) = 0;
+                
+                virtual HRESULT STDMETHODCALLTYPE CreateInstance2( 
+                    /* [in] */ int value,
+                    /* [in] */ int value2,
                     /* [out][retval] */ ABI::WRLWidgetComponent::IWidget **widget) = 0;
                 
             };
@@ -319,9 +324,15 @@ EXTERN_C const IID IID___x_ABI_CWRLWidgetComponent_CIWidgetFactory;
             __x_ABI_CWRLWidgetComponent_CIWidgetFactory * This,
             /* [out] */ TrustLevel *trustLevel);
         
-        HRESULT ( STDMETHODCALLTYPE *CreateInstance4 )( 
+        HRESULT ( STDMETHODCALLTYPE *CreateInstance1 )( 
             __x_ABI_CWRLWidgetComponent_CIWidgetFactory * This,
             /* [in] */ int value,
+            /* [out][retval] */ __x_ABI_CWRLWidgetComponent_CIWidget **widget);
+        
+        HRESULT ( STDMETHODCALLTYPE *CreateInstance2 )( 
+            __x_ABI_CWRLWidgetComponent_CIWidgetFactory * This,
+            /* [in] */ int value,
+            /* [in] */ int value2,
             /* [out][retval] */ __x_ABI_CWRLWidgetComponent_CIWidget **widget);
         
         END_INTERFACE
@@ -357,8 +368,11 @@ EXTERN_C const IID IID___x_ABI_CWRLWidgetComponent_CIWidgetFactory;
     ( (This)->lpVtbl -> GetTrustLevel(This,trustLevel) ) 
 
 
-#define __x_ABI_CWRLWidgetComponent_CIWidgetFactory_CreateInstance4(This,value,widget)	\
-    ( (This)->lpVtbl -> CreateInstance4(This,value,widget) ) 
+#define __x_ABI_CWRLWidgetComponent_CIWidgetFactory_CreateInstance1(This,value,widget)	\
+    ( (This)->lpVtbl -> CreateInstance1(This,value,widget) ) 
+
+#define __x_ABI_CWRLWidgetComponent_CIWidgetFactory_CreateInstance2(This,value,value2,widget)	\
+    ( (This)->lpVtbl -> CreateInstance2(This,value,value2,widget) ) 
 
 #endif /* COBJMACROS */
 
