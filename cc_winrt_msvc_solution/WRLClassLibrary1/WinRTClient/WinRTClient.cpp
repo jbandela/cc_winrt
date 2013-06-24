@@ -117,8 +117,10 @@ int main(){
         std::wcout << L"Domain name: " << uri.GetDomain().c_str() << std::endl;
 
         std::wcout << L"Absolute Canonical Uri: " << uri.AbsoluteCanonicalUri().c_str() << std::endl;
-
-        std::wcout << CUri::static_interface().EscapeComponent(L"http://www.test.com/this is a test").c_str();
+        auto escaped = CUri::EscapeComponent(L"http://www.test.com/this is a test");
+        std::wcout << escaped.c_str() << std::endl;
+        auto unescaped = CUri::UnescapeComponent(escaped);
+        std::wcout << unescaped.c_str() << std::endl;
         
     }
 
