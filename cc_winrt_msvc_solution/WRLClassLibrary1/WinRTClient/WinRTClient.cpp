@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../../../cc_winrt.hpp"
-#include <windows.foundation.h>
 
 // Define the interfaces - taken from windows.foundation.h
 
@@ -108,6 +107,7 @@ typedef cc_winrt::use_winrt_runtime_class<ClassUri_t> CUri;
 
 
 int main(){
+    int sz = sizeof(RO_INIT_TYPE);
     try{
         // Initialize/deinitialize WinRT
         cc_winrt::unique_ro_initialize init;
