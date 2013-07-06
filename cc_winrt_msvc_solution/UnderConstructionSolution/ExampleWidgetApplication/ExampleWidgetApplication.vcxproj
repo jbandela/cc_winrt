@@ -60,6 +60,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="ExampleWidgetApplication_TemporaryKey.pfx" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Logo.png" />
@@ -79,4 +80,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\packages\cpprestsdk.redist.1.0.0\build\native\cpprestsdk.redist.targets" Condition="Exists('..\packages\cpprestsdk.redist.1.0.0\build\native\cpprestsdk.redist.targets')" />
 </Project>

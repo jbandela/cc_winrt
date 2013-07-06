@@ -617,7 +617,10 @@ namespace cc_winrt{
     template<hstring(*pfun_runtime_class_name)(),template<class> class DefaultInterface, template<class> class FactoryInterface, template<class> class StaticInterface, template<class> class... Others>
     struct use_winrt_runtime_class<winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...>>
         :private detail::inspectable_holder,
-        public detail::inherit_use_interfaces_linearly<DefaultInterface,Others...>
+        public detail::inherit_use_interfaces_linearly<DefaultInterface,Others...>,
+        public StaticInterface<cross_compiler_interface::use_unknown<StaticInterface>>
+        ::template cross_compiler_interface_static_interface_mapper<
+        use_winrt_runtime_class<winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...> > > 
     {
         typedef winrt_runtime_class<pfun_runtime_class_name,DefaultInterface,FactoryInterface,StaticInterface,Others...> runtime_class_t;
         cross_compiler_interface::use_unknown<DefaultInterface> default_interface(){
