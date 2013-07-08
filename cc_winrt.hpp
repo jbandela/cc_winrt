@@ -22,6 +22,19 @@ namespace cross_compiler_interface{
 CROSS_COMPILER_INTERFACE_DEFINE_TYPE_INFORMATION(HSTRING);
 CROSS_COMPILER_INTERFACE_DEFINE_TYPE_INFORMATION(TrustLevel);
 
+
+namespace cc_winrt{
+
+	struct InterfaceActivationFactory;
+}
+
+namespace cross_compiler_interface{
+
+	template<>
+	struct allow_interface_to_map_no_prefix<cc_winrt::InterfaceActivationFactory>{
+		enum{value = false};
+	};
+}
 namespace cc_winrt{
 
 
@@ -237,6 +250,7 @@ namespace cc_winrt{
         }
     };
 
+
     // IActivationFactory
 	struct InterfaceActivationFactory{
 		typedef cppcomponents::uuid<0x00000035, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46> uuid;
@@ -264,10 +278,16 @@ namespace cc_winrt{
 			typedef StaticInterface type;
 		};
 
+		template<class... StaticInterfaces>
+		struct check_activation_factory_present<InterfaceActivationFactory, cppcomponents::static_interfaces<StaticInterfaces...> >{
+			typedef cppcomponents::static_interfaces<StaticInterfaces...> type;
+		};
+
 		template<class FactoryInterface, class... StaticInterfaces>
 		struct check_activation_factory_present < FactoryInterface, cppcomponents::static_interfaces<StaticInterfaces...> >{
-			typedef cppcomponents::static_interfaces<StaticInterfaces..., FactoryInterface> type;
+			typedef cppcomponents::static_interfaces<StaticInterfaces..., InterfaceActivationFactory> type;
 		};
+
 
 	}
 
@@ -306,18 +326,32 @@ namespace cc_winrt{
 
     // Enables implementing runtime class
     template<class Derived, class WRC>
-    struct implement_winrt_runtime_class
-	:public cppcomponents::implement_runtime_class_base<Derived,typename WRC::type>
-	,public detail::inherit_from_implement_inspectable<Derived,typename WRC::type>::object_type{
-	
-		typedef cppcomponents::implement_runtime_class_base<Derived, typename WRC::type> imp_rcb_t;
-		struct implement_factory_static_interfaces
-			: public imp_rcb_t::implement_factory_static_interfaces
-			, public detail::inherit_from_implement_inspectable<Derived, typename WRC::type>::static_type{
+	struct implement_winrt_runtime_class
+		: public cppcomponents::implement_runtime_class_base<Derived, typename WRC::type>
+		, public detail::inherit_from_implement_inspectable<Derived, typename WRC::type>::object_type{
+
+			typedef cppcomponents::implement_runtime_class_base<Derived, typename WRC::type> imp_rcb_t;
+
+
+			struct implement_factory_static_interfaces
+				: public imp_rcb_t::implement_factory_static_interfaces
+				, public detail::inherit_from_implement_inspectable<implement_factory_static_interfaces, typename WRC::type>::static_type{
+
+
+					static TrustLevel GetTrustLevel(){ return Derived::GetTrustLevel(); }
+			
+
 
 
 		};
+
+		typedef implement_factory_static_interfaces ImplementFactoryStaticInterfaces;
 		static TrustLevel GetTrustLevel(){ return BaseTrust; }
+
+
+		static cppcomponents::use<cppcomponents::InterfaceUnknown> InterfaceActivationFactory_ActivateInstance(){
+			return Derived::create();
+		}
 	};
 
 

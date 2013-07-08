@@ -3,10 +3,16 @@
 
 struct ImplementCalculator:public cc_winrt::implement_winrt_runtime_class<ImplementCalculator,Calculator_t>{
 
+	std::int32_t factor_;
     std::int32_t Add(std::int32_t a,std::int32_t b){
-        return a + b;
+        return factor_ * (a + b);
     }
 
+	static std::int32_t AddStatic(std::int32_t a, std::int32_t b){ return a + b; }
+
+	ImplementCalculator():factor_(1){}
+
+	ImplementCalculator(std::int32_t f) : factor_(f){}
 };
 
 
