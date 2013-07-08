@@ -3,11 +3,11 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.00.0595 */
-/* at Sat May 11 11:50:08 2013
+ /* File created by MIDL compiler version 8.00.0602 */
+/* at Mon Jul 08 10:28:41 2013
  */
-/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\WRLClassLibrary1.idl-d3d33cea:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0595 
+/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\WRLClassLibrary1.idl-5f39ea43:
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0602 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
@@ -90,7 +90,7 @@ class WinRTClass;
 }
 #endif
 #if !defined(____x_ABI_CWRLClassLibrary1_CIWinRTClass_INTERFACE_DEFINED__)
-extern const __declspec(selectany) WCHAR InterfaceName_WRLClassLibrary1_IWinRTClass[] = L"WRLClassLibrary1.IWinRTClass";
+extern const __declspec(selectany) _Null_terminated_ WCHAR InterfaceName_WRLClassLibrary1_IWinRTClass[] = L"WRLClassLibrary1.IWinRTClass";
 #endif /* !defined(____x_ABI_CWRLClassLibrary1_CIWinRTClass_INTERFACE_DEFINED__) */
 
 
@@ -225,7 +225,7 @@ EXTERN_C const IID IID___x_ABI_CWRLClassLibrary1_CIWinRTClass;
 
 #ifndef RUNTIMECLASS_WRLClassLibrary1_WinRTClass_DEFINED
 #define RUNTIMECLASS_WRLClassLibrary1_WinRTClass_DEFINED
-extern const __declspec(selectany) WCHAR RuntimeClass_WRLClassLibrary1_WinRTClass[] = L"WRLClassLibrary1.WinRTClass";
+extern const __declspec(selectany) _Null_terminated_ WCHAR RuntimeClass_WRLClassLibrary1_WinRTClass[] = L"WRLClassLibrary1.WinRTClass";
 #endif
 
 

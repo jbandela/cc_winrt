@@ -3,8 +3,6 @@
 (function () {
     "use strict";
 
-    WinJS.Binding.optimizeBindingReferences = true;
-
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
 
@@ -30,16 +28,5 @@
         // args.setPromise().
     };
 
-
     app.start();
 })();
-    function Add() {
-        "use strict";
-        //var w = new WRLClassLibrary1.WinRTClass();
-        var calculator = new Contoso.Calculator();
-
-        var a = document.getElementById("a");
-        var b = document.getElementById("b");
-
-        document.getElementById("result").innerHTML = "Result: " + calculator.add(a.value, b.value);
-    }

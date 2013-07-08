@@ -3,11 +3,11 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.00.0595 */
-/* at Sat May 11 18:18:36 2013
+ /* File created by MIDL compiler version 8.00.0602 */
+/* at Mon Jul 08 10:28:46 2013
  */
-/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\Contoso.idl-e251ae85:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0595 
+/* Compiler settings for C:\Users\jrb\AppData\Local\Temp\Contoso.idl-b46b2879:
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0602 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
@@ -91,7 +91,7 @@ class Calculator;
 }
 #endif
 #if !defined(____x_ABI_CContoso_CICalculator_INTERFACE_DEFINED__)
-extern const __declspec(selectany) WCHAR InterfaceName_Contoso_ICalculator[] = L"Contoso.ICalculator";
+extern const __declspec(selectany) _Null_terminated_ WCHAR InterfaceName_Contoso_ICalculator[] = L"Contoso.ICalculator";
 #endif /* !defined(____x_ABI_CContoso_CICalculator_INTERFACE_DEFINED__) */
 
 
@@ -230,7 +230,7 @@ EXTERN_C const IID IID___x_ABI_CContoso_CICalculator;
 
 #ifndef RUNTIMECLASS_Contoso_Calculator_DEFINED
 #define RUNTIMECLASS_Contoso_Calculator_DEFINED
-extern const __declspec(selectany) WCHAR RuntimeClass_Contoso_Calculator[] = L"Contoso.Calculator";
+extern const __declspec(selectany) _Null_terminated_ WCHAR RuntimeClass_Contoso_Calculator[] = L"Contoso.Calculator";
 #endif
 
 

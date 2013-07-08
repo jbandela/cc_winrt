@@ -12,7 +12,7 @@
         template<class T> struct Interface;
 
         // Define the UUID for the class
-        typedef cc_winrt::uuid<0x9E365E57,0x48B2,0x4160,0x95,0x6F,0xC7,0x38,0x51,0x20,0xBB,0xFC> uuid;
+        typedef cppcomponents::uuid<0x9E365E57,0x48B2,0x4160,0x95,0x6F,0xC7,0x38,0x51,0x20,0xBB,0xFC> uuid;
 
         hstring GetAbsoluteUri();
         hstring GetDisplayUri();
@@ -25,19 +25,19 @@
         hstring GetQuery();
 
         // Change so we don't have to define Iwwwformdecoder
-        cc_winrt::use_interface<cc_winrt::InterfaceInspectable> GetQueryParsed();
+        cppcomponents::use<cc_winrt::InterfaceInspectable> GetQueryParsed();
 
         hstring GetRawUri();
         hstring GetSchemeName();
         hstring GetUserName();
         hstring GetPort();
         boolean GetSuspicious();
-        boolean Equals(cc_winrt::use_unknown<Interface>);
-        cc_winrt::use_unknown<Interface> CombineUri(hstring);
+		boolean Equals(cppcomponents::use<InterfaceUriRuntimeClass>);
+		cppcomponents::use<InterfaceUriRuntimeClass> CombineUri(hstring);
 
 
 
-        CC_WINRT_CONSTRUCT_INSPECTABLE_INTERFACE(InterfaceUriRuntimeClass,GetAbsoluteUri,GetDisplayUri,GetDomain,GetExtension,GetFragment,GetHost,GetPassword,GetPath,
+        CCWINRT_CONSTRUCT(InterfaceUriRuntimeClass,GetAbsoluteUri,GetDisplayUri,GetDomain,GetExtension,GetFragment,GetHost,GetPassword,GetPath,
             GetQuery,GetQueryParsed,GetRawUri,GetSchemeName,GetUserName,GetPort,GetSuspicious,Equals,CombineUri);
 
 
@@ -53,11 +53,11 @@
         //}
 
     struct InterfaceUriRuntimeClassWithAbsoluteCanonicalUri{
-        typedef cc_winrt::uuid<0x758D9661,0x221C,0x480F,0xA3,0x39,0x50,0x65,0x66,0x73,0xF4,0x6F> uuid;
+        typedef cppcomponents::uuid<0x758D9661,0x221C,0x480F,0xA3,0x39,0x50,0x65,0x66,0x73,0xF4,0x6F> uuid;
         cc_winrt::hstring AbsoluteCanonicalUri();
         cc_winrt::hstring DisplayIri();
 
-        CC_WINRT_CONSTRUCT_INSPECTABLE_INTERFACE(InterfaceUriRuntimeClassWithAbsoluteCanonicalUri,AbsoluteCanonicalUri,DisplayIri);
+        CCWINRT_CONSTRUCT(InterfaceUriRuntimeClassWithAbsoluteCanonicalUri,AbsoluteCanonicalUri,DisplayIri);
         
 
     };
@@ -72,25 +72,25 @@
         //}
 
     struct InterfaceUriEscapeStatics{
-        typedef cc_winrt::uuid<0xC1D432BA,0xC824,0x4452,0xA7,0xFD,0x51,0x2B,0xC3,0xBB,0xE9,0xA1> uuid;
+        typedef cppcomponents::uuid<0xC1D432BA,0xC824,0x4452,0xA7,0xFD,0x51,0x2B,0xC3,0xBB,0xE9,0xA1> uuid;
 
         cc_winrt::hstring UnescapeComponent(cc_winrt::hstring toUnescape);
         cc_winrt::hstring EscapeComponent(cc_winrt::hstring toUnescape);
 
-        CC_WINRT_CONSTRUCT_INSPECTABLE_INTERFACE(InterfaceUriEscapeStatics,UnescapeComponent,EscapeComponent);
+        CCWINRT_CONSTRUCT(InterfaceUriEscapeStatics,UnescapeComponent,EscapeComponent);
     };
 
 struct InterfaceUriRuntimeClassFactory{
 
     typedef cc_winrt::hstring hstring;
 
-    typedef cc_winrt::uuid<0x44A9796F,0x723E,0x4FDF,0xA2,0x18,0x03,0x3E,0x75,0xB0,0xC0,0x84> uuid;
+    typedef cppcomponents::uuid<0x44A9796F,0x723E,0x4FDF,0xA2,0x18,0x03,0x3E,0x75,0xB0,0xC0,0x84> uuid;
 
-    cc_winrt::use_unknown<InterfaceUriRuntimeClass::Interface> CreateUri(hstring);
-    cc_winrt::use_unknown<InterfaceUriRuntimeClass::Interface> CreateWithRelativeUri(hstring,hstring);
+    cppcomponents::use<InterfaceUriRuntimeClass> CreateUri(hstring);
+	cppcomponents::use< InterfaceUriRuntimeClass > CreateWithRelativeUri(hstring, hstring);
 
     
-    CC_WINRT_CONSTRUCT_INSPECTABLE_INTERFACE(InterfaceUriRuntimeClassFactory,CreateUri,CreateWithRelativeUri);
+    CCWINRT_CONSTRUCT(InterfaceUriRuntimeClassFactory,CreateUri,CreateWithRelativeUri);
 
 };
 
@@ -100,7 +100,7 @@ struct InterfaceUriRuntimeClassFactory{
 
 
 inline  cc_winrt::hstring FoundationUri(){return L"Windows.Foundation.Uri";}
-typedef cc_winrt::winrt_runtime_class<FoundationUri,InterfaceUriRuntimeClass::Interface,InterfaceUriRuntimeClassFactory::Interface,InterfaceUriEscapeStatics::Interface,InterfaceUriRuntimeClassWithAbsoluteCanonicalUri::Interface> ClassUri_t;
+typedef cc_winrt::winrt_runtime_class<FoundationUri,InterfaceUriRuntimeClass,InterfaceUriRuntimeClassFactory,InterfaceUriEscapeStatics,InterfaceUriRuntimeClassWithAbsoluteCanonicalUri> ClassUri_t;
 
 
 typedef cc_winrt::use_winrt_runtime_class<ClassUri_t> CUri;
@@ -117,7 +117,7 @@ int main(){
         std::wcout << L"Domain name: " << uri.GetDomain().c_str() << std::endl;
 
         std::wcout << L"Absolute Canonical Uri: " << uri.AbsoluteCanonicalUri().c_str() << std::endl;
-        auto escaped = CUri::EscapeComponent(L"http://www.test.com/this is a test");
+        auto escaped = CUri::EscapeComponent(L"this is a test");
         std::wcout << escaped.c_str() << std::endl;
         auto unescaped = CUri::UnescapeComponent(escaped);
         std::wcout << unescaped.c_str() << std::endl;
