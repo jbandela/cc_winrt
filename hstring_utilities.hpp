@@ -1,7 +1,7 @@
 #include <Hstring.h>
 #include <Winstring.h>
 #include <string>
-#include "../cross_compiler_call/cross_compiler_interface/cross_compiler_introspection.hpp"
+#include "../cppcomponents/cross_compiler_interface/cross_compiler_introspection.hpp"
 #ifdef max
 #undef max
 #endif

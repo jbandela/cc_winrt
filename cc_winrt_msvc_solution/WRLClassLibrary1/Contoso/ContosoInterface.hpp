@@ -18,32 +18,29 @@
 //    }
 //}
 
-struct InterfaceCalculator{
+struct InterfaceCalculator : public cppcomponents::define_interface < 0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x75,cc_winrt::InterfaceInspectable>{
 
-    typedef cppcomponents::uuid<0xd876445f,0x1574,0x4ff0,0xb4,0x48,0xdb,0x72,0x43,0xb2,0x19,0x75> uuid;
 
     std::int32_t Add(std::int32_t a, std::int32_t b);
 
-    CCWINRT_CONSTRUCT(InterfaceCalculator,Add);
+    CPPCOMPONENTS_CONSTRUCT(InterfaceCalculator,Add);
 
 
 
 };
 
-struct InterfaceCalculatorFactory{
-	typedef cppcomponents::uuid<0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x78> uuid;
+struct InterfaceCalculatorFactory : public cppcomponents::define_interface < 0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x78, cc_winrt::InterfaceInspectable>{
 
 	cppcomponents::use<cppcomponents::InterfaceUnknown> Create(std::int32_t b);
 
-	CCWINRT_CONSTRUCT(InterfaceCalculatorFactory, Create);
+	CPPCOMPONENTS_CONSTRUCT(InterfaceCalculatorFactory, Create);
 
 
-}; struct InterfaceCalculatorStatic{
-	typedef cppcomponents::uuid<0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x79> uuid;
+}; struct InterfaceCalculatorStatic : public cppcomponents::define_interface < 0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x79, cc_winrt::InterfaceInspectable>{
 
 	std::int32_t AddStatic(std::int32_t a,std::int32_t b);
 
-	CCWINRT_CONSTRUCT(InterfaceCalculatorStatic, AddStatic);
+	CPPCOMPONENTS_CONSTRUCT(InterfaceCalculatorStatic, AddStatic);
 
 
 };
@@ -62,7 +59,8 @@ struct InterfaceCalculatorFactory{
 
 inline cc_winrt::hstring ContosoCalculatorName(){return L"Contoso.Calculator";}
 
-typedef cc_winrt::winrt_runtime_class<ContosoCalculatorName, InterfaceCalculator, InterfaceCalculatorFactory, cppcomponents::static_interfaces<> > Calculator_t;
+typedef cc_winrt::winrt_runtime_class<ContosoCalculatorName, cppcomponents::object_interfaces<InterfaceCalculator>,
+	cppcomponents::factory_interface<InterfaceCalculatorFactory>,cppcomponents::static_interfaces<InterfaceCalculatorStatic> > Calculator_t;
 
 
 

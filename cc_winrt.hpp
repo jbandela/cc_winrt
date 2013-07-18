@@ -4,8 +4,8 @@
 #include <Roapi.h> 
 
 #include "hstring_utilities.hpp"
-#include "../cross_compiler_call/cross_compiler_interface/cross_compiler_component.hpp"
-
+#include "../cppcomponents/cppcomponents/cppcomponents.hpp"
+#include "../cppcomponents/cppcomponents/events.hpp"
 
 // Allow HSTRING and TrustLevel to be used in cross_function signatures
 namespace cross_compiler_interface{
@@ -146,7 +146,7 @@ namespace cc_winrt{
     }
 
     // IInspectable
-    struct InterfaceInspectable{
+	struct InterfaceInspectable : public cppcomponents::define_interface<0xAF86E2E0, 0xB12D, 0x4c6a, 0x9C, 0x5A, 0xD7, 0xAA, 0x65, 0x10, 0x1E, 0x90>{
     template<class T>
     struct Interface:public cross_compiler_interface::define_unknown_interface<T,cross_compiler_interface::uuid<0xAF86E2E0,0xB12D,0x4c6a,0x9C,0x5A,0xD7,0xAA,0x65,0x10,0x1E,0x90>, cppcomponents::InterfaceUnknown::Interface>{
 
@@ -159,10 +159,11 @@ namespace cc_winrt{
 		Interface() : GetIids(this), GetRuntimeClassName(this), GetTrustLevel(this){}
 
     };    
-    };
+	};
 
 #define CCWINRT_CONSTRUCT(T,...)  \
-	CPPCOMPONENTS_CONSTRUCT_WITH_BASE(T, cc_winrt::InterfaceInspectable, __VA_ARGS__)
+	typedef cc_winrt::InterfaceInspectable base_interface_t; \
+	CPPCOMPONENTS_CONSTRUCT(T,  __VA_ARGS__)
 #define CCWINRT_CONSTRUCT_WITH_BASE(T,B,...)  \
 	CPPCOMPONENTS_CONSTRUCT_WITH_BASE(T, B, __VA_ARGS__)
 
@@ -252,13 +253,13 @@ namespace cc_winrt{
 
 
     // IActivationFactory
-	struct InterfaceActivationFactory{
+	struct InterfaceActivationFactory : public cppcomponents::define_interface < 0x00000035, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,InterfaceInspectable>{
 		typedef cppcomponents::uuid<0x00000035, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46> uuid;
 
 
 		cppcomponents::use<cppcomponents::InterfaceUnknown> ActivateInstance();
 
-		CCWINRT_CONSTRUCT(InterfaceActivationFactory, ActivateInstance);
+		CPPCOMPONENTS_CONSTRUCT(InterfaceActivationFactory, ActivateInstance);
 
 	};
 
@@ -270,34 +271,52 @@ namespace cc_winrt{
 
 		template<class FactoryInterface,class StaticInterface>
 		struct check_activation_factory_present{
-			typedef cppcomponents::static_interfaces<StaticInterface, InterfaceActivationFactory> type;
 		};
 
-		template<class StaticInterface>
-		struct check_activation_factory_present<InterfaceActivationFactory, StaticInterface>{
-			typedef StaticInterface type;
-		};
+
 
 		template<class... StaticInterfaces>
-		struct check_activation_factory_present<InterfaceActivationFactory, cppcomponents::static_interfaces<StaticInterfaces...> >{
+		struct check_activation_factory_present<cppcomponents::factory_interface<InterfaceActivationFactory>, cppcomponents::static_interfaces<StaticInterfaces...> >{
 			typedef cppcomponents::static_interfaces<StaticInterfaces...> type;
 		};
 
 		template<class FactoryInterface, class... StaticInterfaces>
-		struct check_activation_factory_present < FactoryInterface, cppcomponents::static_interfaces<StaticInterfaces...> >{
+		struct check_activation_factory_present < cppcomponents::factory_interface<FactoryInterface>, cppcomponents::static_interfaces<StaticInterfaces...> >{
 			typedef cppcomponents::static_interfaces<StaticInterfaces..., InterfaceActivationFactory> type;
 		};
 
 
+		struct default_interfaces{
+			typedef cppcomponents::object_interfaces<InterfaceInspectable> oi;
+			typedef cppcomponents::factory_interface<InterfaceActivationFactory> fi;
+			typedef cppcomponents::static_interfaces<> si;
+		};
+
 	}
 
+	//// Define a runtime_class
+	//template < std::string(*pfun_runtime_class_name)(),
+	//class... I  >
+	//struct runtime_class{
+	//	typedef detail::to_oi_fi_si<detail::empty_interfaces, I...> oifisi;
+
+	//	typedef detail::runtime_class_helper<std::string, pfun_runtime_class_name, typename oifisi::oi, typename oifisi::fi, typename oifisi::si> helper;
+
+
+	//	typedef typename helper::type type;
+	//};
 	// Defines a winrt_runtime class
-	template<hstring(*pfun_runtime_class_name)(), class DefaultInterface, class FactoryInterface, class StaticInterface, class... OtherInterfaces>
+	template<hstring(*pfun_runtime_class_name)(), class... I>
 	struct winrt_runtime_class{
 
+		typedef cppcomponents::detail::to_oi_fi_si<detail::default_interfaces, I...> oifisi;
+		typedef typename detail::check_activation_factory_present<typename oifisi::fi, typename oifisi::si>::type si_t;
+
+		typedef cppcomponents::detail::runtime_class_helper<hstring, pfun_runtime_class_name, typename oifisi::oi, typename oifisi::fi, si_t> helper;
+
+
 		// Make sure that activation factory is present, if not add to list as static interface
-		typedef typename detail::check_activation_factory_present<FactoryInterface, StaticInterface>::type si_t;
-		typedef cppcomponents::runtime_class_base<hstring, pfun_runtime_class_name, DefaultInterface, FactoryInterface, si_t, OtherInterfaces...> type;
+		typedef typename helper::type type;
 	};
 
 	namespace detail{
