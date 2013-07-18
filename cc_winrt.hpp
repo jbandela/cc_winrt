@@ -1,4 +1,12 @@
+//          Copyright John R. Bandela 2013.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
 
+
+#pragma once
+#ifndef INCLUDE_GUARD_CC_WINRT_CC_WINRT_HPP_07_18_2013
+#define INCLUDE_GUARD_CC_WINRT_CC_WINRT_HPP_07_18_2013
 #include <Inspectable.h>
 #include <Objbase.h>
 #include <Roapi.h> 
@@ -444,6 +452,7 @@ namespace cc_winrt{
 
 }
 
+#endif
 
 
 

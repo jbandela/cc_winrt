@@ -1,3 +1,12 @@
+//          Copyright John R. Bandela 2013.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+
+#pragma once
+#ifndef INCLUDE_GUARD_CC_WINRT_HSTRING_UTILITIES_HPP_07_18_2013
+#define INCLUDE_GUARD_CC_WINRT_HSTRING_UTILITIES_HPP_07_18_2013
+
 #include <Hstring.h>
 #include <Winstring.h>
 #include <string>
@@ -340,3 +349,5 @@ namespace cross_compiler_interface{
 }
 
 CROSS_COMPILER_INTERFACE_DEFINE_TYPE_INFORMATION(cc_winrt::hstring);
+
+#endif

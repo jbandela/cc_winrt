@@ -5,23 +5,7 @@
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
-// Leak check detection with MSVC
-#ifdef _MSC_VER
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
 
-namespace{
-	struct MemLeakCheckInit{
-		MemLeakCheckInit(){
-			_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-		}
-	};
-
-	MemLeakCheckInit mlcinit;
-}
-#endif
-//
 #pragma comment(lib,"runtimeobject.lib")
 
 #if 1
