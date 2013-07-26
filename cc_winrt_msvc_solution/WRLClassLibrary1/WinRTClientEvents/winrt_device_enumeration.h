@@ -25,13 +25,13 @@ namespace cross_compiler_interface{
 	template<>
 	struct cross_conversion<DeviceWatcherStatus>:public trivial_conversion<DeviceWatcherStatus>{};
 }
-struct InterfaceDeviceWatcher : public cppcomponents::define_interface <0xC9EAB97D, 0x8F6B, 0x4F96, 0xA9, 0xF4, 0xAB, 0xC8, 0x14, 0xE2, 0x22, 0x71, cc_winrt::InterfaceInspectable>{
+struct InterfaceDeviceWatcher : public cppcomponents::define_interface <cppcomponents::uuid<0xC9EAB97D, 0x8F6B, 0x4F96, 0xA9F4, 0xABC814E22271>, cc_winrt::InterfaceInspectable>{
 
 	// Our delegates
-	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, void*), 0x03c5a07b, 0x990c, 0x5d09, 0xb0, 0xb8, 0x57, 0x34, 0xea, 0xa3, 0x82, 0x22> AddHandler;
-	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, void*), 0x906f1254, 0x79ad, 0x54fc, 0x93, 0xc4, 0xcd, 0xb9, 0x9b, 0x43, 0x78, 0x99> UpdateHandler;
-	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, use<InterfaceInspectable>), 0x9234630f, 0x1ff4, 0x54f6, 0x9e, 0x3f, 0xac, 0x20, 0x36, 0x9b, 0x77, 0x25> CompletedHandler;
-	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, use<InterfaceInspectable>), 0x9234630f, 0x1ff4, 0x54f6, 0x9e, 0x3f, 0xac, 0x20, 0x36, 0x9b, 0x77, 0x25> StoppedHandler;
+	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, void*), cppcomponents::uuid<0x03c5a07b, 0x990c, 0x5d09, 0xb0b8, 0x5734eaa38222>> AddHandler;
+	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, void*), cppcomponents::uuid<0x906f1254, 0x79ad, 0x54fc, 0x93c4, 0xcdb99b437899>> UpdateHandler;
+	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, use<InterfaceInspectable>), cppcomponents::uuid<0x9234630f, 0x1ff4, 0x54f6, 0x9e3f, 0xac20369b7725>> CompletedHandler;
+	typedef cppcomponents::event_delegate < void(use<InterfaceDeviceWatcher>, use<InterfaceInspectable>), cppcomponents::uuid<0x9234630f, 0x1ff4, 0x54f6, 0x9e3f, 0xac20369b7725>> StoppedHandler;
 
 
 	std::int64_t add_Added(use<AddHandler>);
@@ -76,7 +76,7 @@ struct InterfaceDeviceWatcher : public cppcomponents::define_interface <0xC9EAB9
 
 };
 
-struct InterfaceDeviceInformationStatics : cppcomponents::define_interface < 0xC17F100E, 0x3A46, 0x4A78, 0x80, 0x13, 0x76, 0x9D, 0xC9, 0xB9, 0x73, 0x90, cc_winrt::InterfaceInspectable>{
+struct InterfaceDeviceInformationStatics : cppcomponents::define_interface < cppcomponents::uuid<0xC17F100E, 0x3A46, 0x4A78, 0x8013, 0x769DC9B97390>, cc_winrt::InterfaceInspectable>{
 
 
 	use<InterfaceInspectable> CreateFromIdAsync(hstring);

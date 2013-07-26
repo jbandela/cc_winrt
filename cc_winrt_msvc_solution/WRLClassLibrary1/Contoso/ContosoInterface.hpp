@@ -18,7 +18,7 @@
 //    }
 //}
 
-struct InterfaceCalculator : public cppcomponents::define_interface < 0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x75,cc_winrt::InterfaceInspectable>{
+struct InterfaceCalculator : public cppcomponents::define_interface <cppcomponents::uuid< 0xd876445f, 0x1574, 0x4ff0, 0xb448, 0xdb7243b21975>,cc_winrt::InterfaceInspectable>{
 
 
     std::int32_t Add(std::int32_t a, std::int32_t b);
@@ -29,14 +29,14 @@ struct InterfaceCalculator : public cppcomponents::define_interface < 0xd876445f
 
 };
 
-struct InterfaceCalculatorFactory : public cppcomponents::define_interface < 0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x78, cc_winrt::InterfaceInspectable>{
+struct InterfaceCalculatorFactory : public cppcomponents::define_interface <cppcomponents::uuid< 0xd876445f, 0x1574, 0x4ff0, 0xb448, 0xdb7243b21978>, cc_winrt::InterfaceInspectable>{
 
 	cppcomponents::use<cppcomponents::InterfaceUnknown> Create(std::int32_t b);
 
 	CPPCOMPONENTS_CONSTRUCT(InterfaceCalculatorFactory, Create);
 
 
-}; struct InterfaceCalculatorStatic : public cppcomponents::define_interface < 0xd876445f, 0x1574, 0x4ff0, 0xb4, 0x48, 0xdb, 0x72, 0x43, 0xb2, 0x19, 0x79, cc_winrt::InterfaceInspectable>{
+}; struct InterfaceCalculatorStatic : public cppcomponents::define_interface < cppcomponents::uuid<0xd876445f, 0x1574, 0x4ff0, 0xb448, 0xdb7243b21979>, cc_winrt::InterfaceInspectable>{
 
 	std::int32_t AddStatic(std::int32_t a,std::int32_t b);
 

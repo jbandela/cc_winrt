@@ -154,9 +154,9 @@ namespace cc_winrt{
     }
 
     // IInspectable
-	struct InterfaceInspectable : public cppcomponents::define_interface<0xAF86E2E0, 0xB12D, 0x4c6a, 0x9C, 0x5A, 0xD7, 0xAA, 0x65, 0x10, 0x1E, 0x90>{
+	struct InterfaceInspectable : public cppcomponents::define_interface<cppcomponents::uuid<0xAF86E2E0, 0xB12D, 0x4c6a, 0x9C5A, 0xD7AA65101E90>>{
     template<class T>
-    struct Interface:public cross_compiler_interface::define_unknown_interface<T,cross_compiler_interface::uuid<0xAF86E2E0,0xB12D,0x4c6a,0x9C,0x5A,0xD7,0xAA,0x65,0x10,0x1E,0x90>, cppcomponents::InterfaceUnknown::Interface>{
+	struct Interface : public cross_compiler_interface::define_unknown_interface<T, cppcomponents::uuid<0xAF86E2E0, 0xB12D, 0x4c6a, 0x9C5A, 0xD7AA65101E90>, cppcomponents::InterfaceUnknown::Interface>{
 
 		detail::get_iids_cross_function<Interface, 0> GetIids;
 		cross_compiler_interface::cross_function<Interface, 1, HSTRING()> GetRuntimeClassName;
@@ -208,7 +208,7 @@ namespace cc_winrt{
             }
 
             static void add_iids(std::vector<cross_compiler_interface::uuid_base>& v){
-                auto& u = typename First::uuid::get();
+                auto& u = typename First::uuid_type::get();
                 v.push_back(u);
 
                 helper<Rest...>::add_iids(v);
@@ -231,7 +231,7 @@ namespace cc_winrt{
 
 
             static void add_iids(std::vector<cross_compiler_interface::uuid_base>& v){
-                auto& u = typename First::uuid::get();
+                auto& u = typename First::uuid_type::get();
                 v.push_back(u);
             }
 
@@ -261,14 +261,11 @@ namespace cc_winrt{
 
 
     // IActivationFactory
-	struct InterfaceActivationFactory : public cppcomponents::define_interface < 0x00000035, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,InterfaceInspectable>{
-		typedef cppcomponents::uuid<0x00000035, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46> uuid;
-
+	struct InterfaceActivationFactory : public cppcomponents::define_interface < cppcomponents::uuid<0x00000035, 0x0000, 0x0000, 0xC000, 0x000000000046>,InterfaceInspectable>{
 
 		cppcomponents::use<cppcomponents::InterfaceUnknown> ActivateInstance();
 
 		CPPCOMPONENTS_CONSTRUCT(InterfaceActivationFactory, ActivateInstance);
-
 	};
 
 
@@ -302,17 +299,7 @@ namespace cc_winrt{
 
 	}
 
-	//// Define a runtime_class
-	//template < std::string(*pfun_runtime_class_name)(),
-	//class... I  >
-	//struct runtime_class{
-	//	typedef detail::to_oi_fi_si<detail::empty_interfaces, I...> oifisi;
 
-	//	typedef detail::runtime_class_helper<std::string, pfun_runtime_class_name, typename oifisi::oi, typename oifisi::fi, typename oifisi::si> helper;
-
-
-	//	typedef typename helper::type type;
-	//};
 	// Defines a winrt_runtime class
 	template<hstring(*pfun_runtime_class_name)(), class... I>
 	struct winrt_runtime_class{
@@ -418,7 +405,7 @@ namespace cc_winrt{
 
 			static cppcomponents::use<InterfaceActivationFactory> get_activation_factory(const hstring& id){
 				cross_compiler_interface::portable_base* paf = nullptr;
-				auto e = ::RoGetActivationFactory(id.value(), cppcomponents::use<InterfaceActivationFactory>::uuid::get_windows_guid<GUID>(), reinterpret_cast<void**>(&paf));
+				auto e = ::RoGetActivationFactory(id.value(), cppcomponents::use<InterfaceActivationFactory>::uuid_type::get_windows_guid<GUID>(), reinterpret_cast<void**>(&paf));
 				if (e < 0){
 					cross_compiler_interface::general_error_mapper::exception_from_error_code(e);
 				}
